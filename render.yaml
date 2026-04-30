@@ -1,0 +1,22 @@
+services:
+  # ── R Plumber API ──────────────────────────────────────────────────────────
+  - type: web
+    name: workforcex-api
+    runtime: docker
+    dockerfilePath: ./attrition_analysis.r/plumber_api/Dockerfile
+    dockerContext: ./attrition_analysis.r/plumber_api
+    plan: free
+    envVars:
+      - key: API_DIR
+        value: /app
+
+  # ── React Frontend (static site) ──────────────────────────────────────────
+  - type: web
+    name: workforcex-frontend
+    runtime: static
+    buildCommand: cd frontend && npm ci && npx vite build
+    staticPublishPath: ./frontend/dist
+    plan: free
+    envVars:
+      - key: VITE_API_URL
+        value: https://workforcex-api.onrender.com
