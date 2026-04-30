@@ -28,7 +28,8 @@ function(req, res) {
 # Load model and scaling params once at startup
 # =============================================================================
 
-BASE_DIR    <- "C:/Users/ayhin/Desktop/Attrition/attrition_analysis.r"
+# Resolve paths relative to this file's directory (works locally and in Docker)
+BASE_DIR    <- Sys.getenv("API_DIR", unset = getwd())
 MODEL_PATH  <- file.path(BASE_DIR, "model_final.rds")
 SCALER_PATH <- file.path(BASE_DIR, "scaling_params.rds")
 
