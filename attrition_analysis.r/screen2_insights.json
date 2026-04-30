@@ -1,0 +1,28 @@
+﻿{
+    "id":  3,
+    "jsonrpc":  "2.0",
+    "result":  {
+                   "content":  [
+                                   {
+                                       "text":  "{\"name\":\"projects/6257650906793362372/screens/b83c01c5566641e7a3a6d999100955d6\",\"title\":\"Model Insights \u0026 Evaluation\",\"screenshot\":{\"name\":\"projects/6257650906793362372/files/d166156d94684e9b960ac90bad041bed\",\"downloadUrl\":\"https://lh3.googleusercontent.com/aida/ADBb0ug--O0wk9w80Z7-mCFzWR6no5p_kSRtG43-mDO6D5z96XT2KoF-83M2WB1W-f1M1aToNjDIa3Ey4-zv4SfN6D-wFAwPAUYIW4JtY_Q8qb1vFiW7IUFrSqXWqlMHdACmo-yNkBlf3saq6LWSVlGQJonJgSKusmHjDqnFYwEvOsTr9pCzdRSZrfdZ0RVe2HVR-6ia5Pl0-rR4X9b2-KNk_FfhDzlREszTap-7jF0yKrthoIxYB3nqd6uekr0\"},\"htmlCode\":{\"name\":\"projects/6257650906793362372/files/924292a94a284a0cbb484605526bad0e\",\"downloadUrl\":\"https://contribution.usercontent.google.com/download?c=CgthaWRhX2NvZGVmeBJ7Eh1hcHBfY29tcGFuaW9uX2dlbmVyYXRlZF9maWxlcxpaCiVodG1sX2I5OTg0MzMyOGNmYzRkZWE5YmIwNzMxZTE5NzcwZGE4EgsSBxCPkMzkhw0YAZIBIwoKcHJvamVjdF9pZBIVQhM2MjU3NjUwOTA2NzkzMzYyMzcy\u0026filename=\u0026opi=89354086\",\"mimeType\":\"text/html\"},\"width\":\"2560\",\"height\":\"2424\",\"deviceType\":\"DESKTOP\"}",
+                                       "type":  "text"
+                                   }
+                               ],
+                   "structuredContent":  {
+                                             "deviceType":  "DESKTOP",
+                                             "height":  "2424",
+                                             "htmlCode":  {
+                                                              "downloadUrl":  "https://contribution.usercontent.google.com/download?c=CgthaWRhX2NvZGVmeBJ7Eh1hcHBfY29tcGFuaW9uX2dlbmVyYXRlZF9maWxlcxpaCiVodG1sX2I5OTg0MzMyOGNmYzRkZWE5YmIwNzMxZTE5NzcwZGE4EgsSBxCPkMzkhw0YAZIBIwoKcHJvamVjdF9pZBIVQhM2MjU3NjUwOTA2NzkzMzYyMzcy\u0026filename=\u0026opi=89354086",
+                                                              "mimeType":  "text/html",
+                                                              "name":  "projects/6257650906793362372/files/924292a94a284a0cbb484605526bad0e"
+                                                          },
+                                             "name":  "projects/6257650906793362372/screens/b83c01c5566641e7a3a6d999100955d6",
+                                             "screenshot":  {
+                                                                "downloadUrl":  "https://lh3.googleusercontent.com/aida/ADBb0ug--O0wk9w80Z7-mCFzWR6no5p_kSRtG43-mDO6D5z96XT2KoF-83M2WB1W-f1M1aToNjDIa3Ey4-zv4SfN6D-wFAwPAUYIW4JtY_Q8qb1vFiW7IUFrSqXWqlMHdACmo-yNkBlf3saq6LWSVlGQJonJgSKusmHjDqnFYwEvOsTr9pCzdRSZrfdZ0RVe2HVR-6ia5Pl0-rR4X9b2-KNk_FfhDzlREszTap-7jF0yKrthoIxYB3nqd6uekr0",
+                                                                "name":  "projects/6257650906793362372/files/d166156d94684e9b960ac90bad041bed"
+                                                            },
+                                             "title":  "Model Insights \u0026 Evaluation",
+                                             "width":  "2560"
+                                         }
+               }
+}

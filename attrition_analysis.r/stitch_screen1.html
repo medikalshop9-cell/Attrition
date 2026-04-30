@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>HR Predict AI - Attrition Prediction Tool</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary": "#00312c",
+                        "error-container": "#ffdad6",
+                        "secondary": "#515f74",
+                        "surface-tint": "#4059aa",
+                        "on-tertiary": "#ffffff",
+                        "on-surface-variant": "#444651",
+                        "on-tertiary-fixed": "#00201d",
+                        "outline-variant": "#c5c5d3",
+                        "inverse-surface": "#2d3133",
+                        "on-primary": "#ffffff",
+                        "primary-fixed-dim": "#b6c4ff",
+                        "on-primary-fixed": "#00164e",
+                        "on-primary-fixed-variant": "#264191",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed": "#0d1c2f",
+                        "secondary-fixed-dim": "#b9c7e0",
+                        "surface-container": "#eceef0",
+                        "on-primary-container": "#90a8ff",
+                        "surface-dim": "#d8dadc",
+                        "outline": "#757682",
+                        "on-surface": "#191c1e",
+                        "on-secondary-container": "#57657b",
+                        "surface-container-low": "#f2f4f6",
+                        "background": "#f7f9fb",
+                        "tertiary-fixed": "#89f5e7",
+                        "primary-container": "#1e3a8a",
+                        "inverse-primary": "#b6c4ff",
+                        "surface": "#f7f9fb",
+                        "error": "#ba1a1a",
+                        "primary-fixed": "#dce1ff",
+                        "inverse-on-surface": "#eff1f3",
+                        "surface-variant": "#e0e3e5",
+                        "on-tertiary-fixed-variant": "#005049",
+                        "on-secondary": "#ffffff",
+                        "on-background": "#191c1e",
+                        "surface-container-highest": "#e0e3e5",
+                        "on-error-container": "#93000a",
+                        "tertiary-container": "#004942",
+                        "secondary-container": "#d5e3fd",
+                        "surface-container-high": "#e6e8ea",
+                        "on-secondary-fixed-variant": "#3a485c",
+                        "secondary-fixed": "#d5e3fd",
+                        "surface-bright": "#f7f9fb",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-fixed-dim": "#6bd8cb",
+                        "primary": "#00236f",
+                        "on-tertiary-container": "#4ebdb0"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "md": "16px",
+                        "xs": "4px",
+                        "gutter": "20px",
+                        "base": "4px",
+                        "container-max": "1440px",
+                        "sm": "8px",
+                        "lg": "24px",
+                        "xl": "32px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-md": ["Inter"],
+                        "data-tabular": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-xl": ["Inter"],
+                        "headline-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "data-tabular": ["13px", {"lineHeight": "18px", "fontWeight": "500"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "headline-xl": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-lg": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f9fb;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen">
+<!-- SideNavBar (Execution from JSON) -->
+<nav class="hidden md:flex flex-col h-full py-6 bg-slate-50 border-r border-slate-200 h-screen w-64 fixed left-0 top-0 z-50 font-inter font-medium text-sm">
+<div class="px-6 mb-8">
+<h1 class="text-xl font-black text-blue-900">HR Predict AI</h1>
+<p class="text-[10px] uppercase tracking-widest text-slate-400 mt-1">Enterprise Analytics</p>
+</div>
+<div class="flex-1 space-y-1">
+<a class="text-slate-600 px-4 py-3 flex items-center gap-3 hover:bg-slate-100 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                Dashboard
+            </a>
+<a class="bg-white text-blue-700 font-bold border-r-4 border-blue-700 px-4 py-3 flex items-center gap-3 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+                Attrition Risk
+            </a>
+<a class="text-slate-600 px-4 py-3 flex items-center gap-3 hover:bg-slate-100 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+                Employee List
+            </a>
+<a class="text-slate-600 px-4 py-3 flex items-center gap-3 hover:bg-slate-100 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="query_stats">query_stats</span>
+                Model Insights
+            </a>
+<a class="text-slate-600 px-4 py-3 flex items-center gap-3 hover:bg-slate-100 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+                Settings
+            </a>
+</div>
+<div class="px-6 mt-auto">
+<div class="flex items-center gap-3 p-3 bg-white rounded-lg border border-slate-200">
+<img alt="User" class="w-8 h-8 rounded-full bg-slate-100" data-alt="A professional close-up of a diverse HR executive profile picture in a minimalist, bright digital interface. The background is a clean, out-of-focus modern office setting with soft blue and white lighting. The image style is crisp, high-definition, and evokes corporate trust and analytical sophistication." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAbN854E2_ctqs6mNxDDXV_nm9krqVgca20MhkXWxMFXstXUB1zIR2QFtwy-DPAnuElHDsfZsQFVFkPzdqBHRBwe_cOz_L6CABEzKsuJa6D3hdMaV4_MbSn_AnmxtdfCWzZvbgDIdYCH_mhlwB4PqdBCvx0d2x4DLHVpPr_jQa5p41gllWqyIWs44MnBzgpJabnEF3FW0EFkvkA3O47GNdtJ9KGOrt2VRUvygGgqg6REuRQAsDoCKJc_PhsUwaZVNpUyBiSBNoFGx8"/>
+<div class="overflow-hidden">
+<p class="text-xs font-bold truncate">Sarah Jenkins</p>
+<p class="text-[10px] text-slate-400 truncate">Senior HR Lead</p>
+</div>
+</div>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="md:ml-64 min-h-screen">
+<!-- TopAppBar (Execution from JSON) -->
+<header class="flex justify-between items-center px-6 h-16 w-full sticky top-0 bg-white/90 backdrop-blur-md border-b border-slate-200 z-40 font-inter antialiased text-sm">
+<div class="flex items-center gap-6">
+<span class="text-lg font-bold tracking-tight text-blue-900">HR Predict AI</span>
+<div class="hidden lg:flex items-center bg-slate-100 rounded-full px-4 py-1.5 gap-2 border border-slate-200">
+<span class="material-symbols-outlined text-slate-400 text-sm" data-icon="search">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-xs w-48" placeholder="Search employees..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-slate-500 hover:bg-slate-50 p-2 rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="text-slate-500 hover:bg-slate-50 p-2 rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+</button>
+</div>
+</header>
+<div class="p-lg lg:p-xl max-w-7xl mx-auto">
+<!-- Breadcrumb & Title -->
+<div class="mb-xl">
+<nav class="flex items-center gap-2 text-label-md text-slate-400 mb-2 font-label-md">
+<span>ANALYTICS</span>
+<span class="material-symbols-outlined text-[14px]" data-icon="chevron_right">chevron_right</span>
+<span class="text-blue-700">ATTRITION PREDICTION TOOL</span>
+</nav>
+<h2 class="text-headline-xl font-headline-xl text-on-surface">Predict Employee Churn</h2>
+<p class="text-body-md font-body-md text-secondary mt-1">Input employee metrics to calculate risk probability based on historical data patterns.</p>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-lg items-start">
+<!-- Input Form Section (The Predictor) -->
+<section class="lg:col-span-8 bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
+<div class="p-lg border-b border-outline-variant flex items-center justify-between bg-white">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="person_search">person_search</span>
+<h3 class="text-headline-md font-headline-md text-on-surface">Employee Profile Details</h3>
+</div>
+<span class="text-label-md font-label-md text-secondary bg-slate-100 px-3 py-1 rounded-full">ACTIVE MODEL: V2.4.1</span>
+</div>
+<form class="p-lg space-y-xl">
+<!-- Multi-step Simulation / Grouped Fields -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<!-- Demographic & Basic -->
+<div class="space-y-md">
+<label class="block">
+<span class="text-label-md font-label-md text-secondary mb-1 block uppercase">Age</span>
+<input class="w-full bg-white border border-outline-variant rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary focus:border-primary text-body-md font-body-md" placeholder="e.g. 34" type="number"/>
+</label>
+<label class="block">
+<span class="text-label-md font-label-md text-secondary mb-1 block uppercase">Business Travel</span>
+<select class="w-full bg-white border border-outline-variant rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary focus:border-primary text-body-md font-body-md">
+<option>Travel_Rarely</option>
+<option>Travel_Frequently</option>
+<option>Non-Travel</option>
+</select>
+</label>
+<label class="block">
+<span class="text-label-md font-label-md text-secondary mb-1 block uppercase">Education Level</span>
+<div class="flex gap-2">
+<button class="flex-1 py-2 border border-outline-variant rounded-lg text-xs font-bold bg-white hover:bg-slate-50 transition-colors" type="button">1</button>
+<button class="flex-1 py-2 border border-outline-variant rounded-lg text-xs font-bold bg-white hover:bg-slate-50 transition-colors" type="button">2</button>
+<button class="flex-1 py-2 border border-primary text-primary bg-primary-fixed-dim/20 rounded-lg text-xs font-bold" type="button">3</button>
+<button class="flex-1 py-2 border border-outline-variant rounded-lg text-xs font-bold bg-white hover:bg-slate-50 transition-colors" type="button">4</button>
+<button class="flex-1 py-2 border border-outline-variant rounded-lg text-xs font-bold bg-white hover:bg-slate-50 transition-colors" type="button">5</button>
+</div>
+</label>
+<label class="block">
+<span class="text-label-md font-label-md text-secondary mb-1 block uppercase">Distance From Home (KM)</span>
+<input class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-primary" type="range"/>
+<div class="flex justify-between text-[10px] text-slate-400 mt-1"><span>1km</span><span>50km</span></div>
+</label>
+</div>
+<!-- Professional & Compensation -->
+<div class="space-y-md">
+<label class="block">
+<span class="text-label-md font-label-md text-secondary mb-1 block uppercase">Department</span>
+<select class="w-full bg-white border border-outline-variant rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary focus:border-primary text-body-md font-body-md">
+<option>Research &amp; Development</option>
+<option>Sales</option>
+<option>Human Resources</option>
+</select>
+</label>
+<label class="block">
+<span class="text-label-md font-label-md text-secondary mb-1 block uppercase">Job Role</span>
+<select class="w-full bg-white border border-outline-variant rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary focus:border-primary text-body-md font-body-md">
+<option>Healthcare Representative</option>
+<option>Manager</option>
+<option>Manufacturing Director</option>
+<option>Research Scientist</option>
+<option>Sales Executive</option>
+</select>
+</label>
+<label class="block">
+<span class="text-label-md font-label-md text-secondary mb-1 block uppercase">Monthly Income ($)</span>
+<div class="relative">
+<span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">$</span>
+<input class="w-full bg-white border border-outline-variant rounded-lg pl-8 pr-4 py-2.5 focus:ring-2 focus:ring-primary focus:border-primary text-body-md font-body-md" placeholder="5993" type="number"/>
+</div>
+</label>
+<div class="p-md bg-slate-50 border border-dashed border-outline-variant rounded-lg">
+<div class="flex items-center justify-between">
+<div>
+<span class="text-label-md font-label-md text-on-surface block">OverTime Status</span>
+<span class="text-[10px] text-secondary">Does employee work extra hours?</span>
+</div>
+<button class="w-12 h-6 bg-primary rounded-full relative flex items-center px-1 transition-all" type="button">
+<div class="w-4 h-4 bg-white rounded-full ml-auto"></div>
+</button>
+</div>
+</div>
+</div>
+</div>
+<div class="pt-lg flex items-center justify-end gap-md border-t border-outline-variant">
+<button class="px-6 py-2.5 text-body-md font-bold text-secondary hover:bg-slate-100 rounded-lg transition-colors" type="reset">Clear Form</button>
+<button class="px-8 py-2.5 bg-primary text-white text-body-md font-bold rounded-lg shadow-lg shadow-primary/20 flex items-center gap-2 hover:opacity-90 active:scale-95 transition-all" type="submit">
+<span class="material-symbols-outlined text-[20px]" data-icon="bolt">bolt</span>
+                                Run Prediction
+                            </button>
+</div>
+</form>
+</section>
+<!-- Prediction Result Section -->
+<aside class="lg:col-span-4 space-y-lg">
+<!-- Probability Card -->
+<div class="bg-white border border-outline-variant rounded-xl p-lg relative overflow-hidden">
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16"></div>
+<div class="relative z-10">
+<h4 class="text-label-md font-label-md text-secondary uppercase tracking-wider mb-lg">Attrition Probability</h4>
+<div class="flex items-end gap-2 mb-md">
+<span class="text-[56px] font-black text-on-surface leading-none">68</span>
+<span class="text-headline-lg font-headline-lg text-secondary mb-1">%</span>
+</div>
+<!-- Risk Badge -->
+<div class="inline-flex items-center gap-2 bg-error-container text-on-error-container px-4 py-1.5 rounded-full border border-error/20 mb-xl">
+<span class="material-symbols-outlined text-[16px]" data-icon="warning" data-weight="fill">warning</span>
+<span class="text-label-md font-label-md font-bold">HIGH RISK</span>
+</div>
+<!-- Progress Track -->
+<div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden mb-xs">
+<div class="h-full bg-error rounded-full" style="width: 68%"></div>
+</div>
+<div class="flex justify-between text-[10px] font-bold text-slate-400">
+<span>LOW</span>
+<span>HIGH</span>
+</div>
+</div>
+</div>
+<!-- Top Contributing Factors -->
+<div class="bg-surface-container-low border border-outline-variant rounded-xl p-lg">
+<div class="flex items-center gap-2 mb-lg">
+<span class="material-symbols-outlined text-primary text-[20px]" data-icon="insights">insights</span>
+<h4 class="text-headline-md font-headline-md text-on-surface">Top Factors</h4>
+</div>
+<div class="space-y-md">
+<div class="p-md bg-white rounded-lg border border-outline-variant flex items-start gap-3">
+<div class="w-8 h-8 rounded bg-error-container/30 flex items-center justify-center text-error">
+<span class="material-symbols-outlined text-[18px]" data-icon="schedule">schedule</span>
+</div>
+<div>
+<p class="text-body-md font-bold text-on-surface">Frequent OverTime</p>
+<p class="text-[12px] text-secondary leading-tight mt-1">Increases burnout probability by 34% in this role.</p>
+</div>
+</div>
+<div class="p-md bg-white rounded-lg border border-outline-variant flex items-start gap-3">
+<div class="w-8 h-8 rounded bg-secondary-container/30 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[18px]" data-icon="flight_takeoff">flight_takeoff</span>
+</div>
+<div>
+<p class="text-body-md font-bold text-on-surface">Travel Frequency</p>
+<p class="text-[12px] text-secondary leading-tight mt-1">"Travel_Frequently" correlates with 12% higher churn.</p>
+</div>
+</div>
+<div class="p-md bg-white rounded-lg border border-outline-variant flex items-start gap-3">
+<div class="w-8 h-8 rounded bg-primary-fixed-dim/30 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[18px]" data-icon="payments">payments</span>
+</div>
+<div>
+<p class="text-body-md font-bold text-on-surface">Monthly Income</p>
+<p class="text-[12px] text-secondary leading-tight mt-1">Salary is 15% below the departmental median.</p>
+</div>
+</div>
+</div>
+<!-- AI Suggestion Tooltip Style Component -->
+<div class="mt-xl p-md bg-gradient-to-br from-blue-50 to-indigo-50 border border-primary/20 rounded-lg relative">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-primary text-[18px]" data-icon="auto_awesome">auto_awesome</span>
+<span class="text-label-md font-label-md text-primary">AI RECOMMENDATION</span>
+</div>
+<p class="text-body-md text-on-surface-variant italic">
+                                "Consider reviewing work-life balance initiatives. Reducing mandatory overtime could lower risk to Medium (34%)."
+                            </p>
+</div>
+</div>
+</aside>
+</div>
+<!-- Contextual Graphics / Decorative -->
+<div class="mt-xl grid grid-cols-1 md:grid-cols-3 gap-lg">
+<div class="relative h-48 rounded-xl overflow-hidden group">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="A clean, high-tech data visualization dashboard shown on a sleek tablet screen. The graphics feature smooth gradients of deep blue and teal, showing line graphs of employee retention trends. The lighting is soft and professional, with a minimalist aesthetic that conveys analytical precision and human resources intelligence." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAogTKmC5s3ZW5WQrCrP4bElMNO4gLii66zXndHQGtoKpvdwcaQ9nRQdP9sZfNsPkDp7wM1AQmw2fKTxkKHbCPux7b72fJ96-dOAN5Pk_2t_rQQWsPk_Cp5kmmWsst99bALRKwXann1GBU03buWCoPooqRFJVsy4dVOSGrWfJzLVjp3zjBXfIJi0oJO1ky1gctDHyCdncuLPud_4rhNYUyKJI6N0PAuUs-acuFfz-ZM4aRG-dHbVIlCURDpZD5c3oVu9Dur74ekayk"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-md">
+<p class="text-white font-bold text-sm">Model Accuracy: 94.2%</p>
+<p class="text-white/70 text-[10px]">Updated 2 hours ago</p>
+</div>
+</div>
+<div class="md:col-span-2 bg-white border border-outline-variant rounded-xl p-lg flex flex-col justify-center">
+<div class="flex items-center gap-4">
+<div class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center">
+<span class="material-symbols-outlined text-3xl text-slate-300" data-icon="monitoring">monitoring</span>
+</div>
+<div>
+<h5 class="text-headline-md font-headline-md text-on-surface">Regional Benchmarking</h5>
+<p class="text-body-md text-secondary">Compare this prediction against the industry average for Research &amp; Development roles in North America.</p>
+<button class="mt-md text-primary font-bold text-label-md flex items-center gap-1 hover:underline">
+                                VIEW COMPARISON <span class="material-symbols-outlined text-[14px]" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Floating Action Button (Contextual Execution) -->
+<button class="fixed bottom-lg right-lg w-14 h-14 bg-primary text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-transform active:scale-95 z-50">
+<span class="material-symbols-outlined text-[24px]" data-icon="add">add</span>
+</button>
+</body></html>

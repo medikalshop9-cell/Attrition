@@ -1,0 +1,475 @@
+import { useState } from 'react'
+import { predict } from '../api'
+import { db } from '../firebase'
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
+
+const DEFAULT_FORM = {
+  Age: 34,
+  BusinessTravel: 'Travel_Rarely',
+  DailyRate: 802,
+  Department: 'Research & Development',
+  DistanceFromHome: 9,
+  Education: 3,
+  EducationField: 'Life Sciences',
+  EnvironmentSatisfaction: 3,
+  Gender: 'Male',
+  HourlyRate: 66,
+  JobInvolvement: 3,
+  JobLevel: 2,
+  JobRole: 'Research Scientist',
+  JobSatisfaction: 3,
+  MaritalStatus: 'Single',
+  MonthlyIncome: 5993,
+  MonthlyRate: 19479,
+  NumCompaniesWorked: 2,
+  OverTime: 'No',
+  PercentSalaryHike: 13,
+  PerformanceRating: 3,
+  RelationshipSatisfaction: 3,
+  StockOptionLevel: 1,
+  TotalWorkingYears: 8,
+  TrainingTimesLastYear: 2,
+  WorkLifeBalance: 3,
+  YearsAtCompany: 5,
+  YearsInCurrentRole: 3,
+  YearsSinceLastPromotion: 1,
+  YearsWithCurrManager: 3,
+}
+
+const TOP_FACTORS = {
+  High: [
+    { icon: 'schedule', color: 'bg-red-100 text-red-600', label: 'OverTime Active', desc: 'Working extra hours significantly raises burnout risk.' },
+    { icon: 'flight_takeoff', color: 'bg-amber-100 text-amber-600', label: 'High Travel Frequency', desc: '"Travel_Frequently" correlates with 12% higher churn.' },
+    { icon: 'payments', color: 'bg-blue-100 text-blue-700', label: 'Below-median Income', desc: 'Monthly income below departmental median.' },
+  ],
+  Medium: [
+    { icon: 'trending_up', color: 'bg-amber-100 text-amber-600', label: 'Low Promotion Rate', desc: 'No promotion in last 3+ years.' },
+    { icon: 'work_history', color: 'bg-blue-100 text-blue-700', label: 'Multiple Companies', desc: 'Employee has worked at several organisations.' },
+  ],
+  Low: [
+    { icon: 'check_circle', color: 'bg-green-100 text-green-700', label: 'Good Job Satisfaction', desc: 'Employee reports high overall satisfaction.' },
+    { icon: 'home', color: 'bg-green-100 text-green-700', label: 'Close to Work', desc: 'Short commute reduces stress.' },
+  ],
+}
+
+function RiskBadge({ level }) {
+  const styles = {
+    High: 'bg-red-100 text-red-700 border-red-200',
+    Medium: 'bg-amber-100 text-amber-700 border-amber-200',
+    Low: 'bg-green-100 text-green-700 border-green-200',
+  }
+  const icons = { High: 'warning', Medium: 'info', Low: 'check_circle' }
+  return (
+    <span className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full border font-bold text-label-md ${styles[level]}`}>
+      <span className="material-symbols-outlined text-[16px]">{icons[level]}</span>
+      {level.toUpperCase()} RISK
+    </span>
+  )
+}
+
+function SegmentedButtons({ value, onChange, options }) {
+  return (
+    <div className="flex gap-1.5">
+      {options.map((opt) => (
+        <button
+          key={opt}
+          type="button"
+          onClick={() => onChange(opt)}
+          className={`flex-1 py-2 rounded-lg text-xs font-bold transition-colors border ${
+            value === opt
+              ? 'border-primary text-primary bg-blue-50'
+              : 'border-outline-variant text-slate-600 bg-white hover:bg-slate-50'
+          }`}
+        >
+          {opt}
+        </button>
+      ))}
+    </div>
+  )
+}
+
+function SelectField({ label, name, value, onChange, options }) {
+  return (
+    <label className="block">
+      <span className="text-label-md font-label-md text-secondary mb-1 block uppercase">{label}</span>
+      <select
+        name={name}
+        value={value}
+        onChange={onChange}
+        className="w-full bg-white border border-outline-variant rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary focus:border-primary text-body-md outline-none"
+      >
+        {options.map((o) => (
+          <option key={o.value ?? o} value={o.value ?? o}>{o.label ?? o}</option>
+        ))}
+      </select>
+    </label>
+  )
+}
+
+function NumberField({ label, name, value, onChange, prefix }) {
+  return (
+    <label className="block">
+      <span className="text-label-md font-label-md text-secondary mb-1 block uppercase">{label}</span>
+      <div className="relative">
+        {prefix && (
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">{prefix}</span>
+        )}
+        <input
+          type="number"
+          name={name}
+          value={value}
+          onChange={onChange}
+          className={`w-full bg-white border border-outline-variant rounded-lg ${prefix ? 'pl-8 pr-4' : 'px-4'} py-2.5 focus:ring-2 focus:ring-primary focus:border-primary text-body-md outline-none`}
+        />
+      </div>
+    </label>
+  )
+}
+
+export default function PredictionTool() {
+  const [form, setForm] = useState(DEFAULT_FORM)
+  const [result, setResult] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
+
+  function handleChange(e) {
+    const { name, value, type } = e.target
+    setForm((f) => ({ ...f, [name]: type === 'number' ? Number(value) : value }))
+  }
+
+  function handleSegmented(name, value) {
+    setForm((f) => ({ ...f, [name]: Number(value) }))
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault()
+    setLoading(true)
+    setError(null)
+    setResult(null)
+    try {
+      const payload = { ...form }
+      const res = await predict(payload)
+      setResult(res)
+      // Save to Firestore predictions collection
+      try {
+        await addDoc(collection(db, 'predictions'), {
+          ...payload,
+          prediction: res.prediction,
+          probability: res.probability,
+          risk_level: res.risk_level,
+          timestamp: serverTimestamp(),
+        })
+      } catch {
+        // Firestore unavailable (config not yet set); ignore silently
+      }
+    } catch (err) {
+      setError(err.response?.data?.error || err.message || 'Prediction failed. Is the R API running on port 8000?')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  function handleReset() {
+    setForm(DEFAULT_FORM)
+    setResult(null)
+    setError(null)
+  }
+
+  const probability = result ? Math.round(result.probability * 100) : null
+  const riskLevel = result?.risk_level ?? null
+  const factors = riskLevel ? TOP_FACTORS[riskLevel] : TOP_FACTORS.Low
+
+  return (
+    <div>
+      {/* Breadcrumb + Title */}
+      <div className="mb-8">
+        <nav className="flex items-center gap-2 text-label-md text-slate-400 mb-2 uppercase">
+          <span>Analytics</span>
+          <span className="material-symbols-outlined text-[14px]">chevron_right</span>
+          <span className="text-blue-700">Attrition Prediction Tool</span>
+        </nav>
+        <h2 className="text-headline-xl font-bold text-on-surface">Predict Employee Churn</h2>
+        <p className="text-body-md text-secondary mt-1">Input employee metrics to calculate risk probability based on historical data patterns.</p>
+      </div>
+
+      {/* Bento Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* Form — left 8 cols */}
+        <section className="lg:col-span-8 bg-white border border-slate-200 rounded-xl overflow-hidden">
+          <div className="p-6 border-b border-slate-200 flex items-center justify-between bg-white">
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-primary">person_search</span>
+              <h3 className="text-headline-md font-semibold text-on-surface">Employee Profile Details</h3>
+            </div>
+            <span className="text-label-md text-secondary bg-slate-100 px-3 py-1 rounded-full uppercase">Active Model: LR v1.0</span>
+          </div>
+
+          <form onSubmit={handleSubmit} className="p-6 space-y-8">
+            {/* Row 1: Demographic */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Left col */}
+              <div className="space-y-4">
+                <NumberField label="Age" name="Age" value={form.Age} onChange={handleChange} />
+                <SelectField
+                  label="Business Travel"
+                  name="BusinessTravel"
+                  value={form.BusinessTravel}
+                  onChange={handleChange}
+                  options={['Travel_Rarely', 'Travel_Frequently', 'Non-Travel']}
+                />
+                <label className="block">
+                  <span className="text-label-md font-label-md text-secondary mb-1 block uppercase">Education Level</span>
+                  <SegmentedButtons
+                    value={form.Education}
+                    onChange={(v) => handleSegmented('Education', v)}
+                    options={[1, 2, 3, 4, 5]}
+                  />
+                </label>
+                <label className="block">
+                  <span className="text-label-md font-label-md text-secondary mb-1 block uppercase">Distance From Home (km)</span>
+                  <input
+                    type="range" name="DistanceFromHome" min={1} max={50}
+                    value={form.DistanceFromHome}
+                    onChange={(e) => setForm((f) => ({ ...f, DistanceFromHome: Number(e.target.value) }))}
+                    className="w-full h-1.5 bg-slate-200 rounded-full appearance-none cursor-pointer accent-primary"
+                  />
+                  <div className="flex justify-between text-[10px] text-slate-400 mt-1">
+                    <span>1 km</span><span className="font-semibold text-slate-600">{form.DistanceFromHome} km</span><span>50 km</span>
+                  </div>
+                </label>
+                <SelectField
+                  label="Gender"
+                  name="Gender"
+                  value={form.Gender}
+                  onChange={handleChange}
+                  options={['Male', 'Female']}
+                />
+                <SelectField
+                  label="Marital Status"
+                  name="MaritalStatus"
+                  value={form.MaritalStatus}
+                  onChange={handleChange}
+                  options={['Single', 'Married', 'Divorced']}
+                />
+                <SelectField
+                  label="Education Field"
+                  name="EducationField"
+                  value={form.EducationField}
+                  onChange={handleChange}
+                  options={['Human Resources', 'Life Sciences', 'Marketing', 'Medical', 'Other', 'Technical Degree']}
+                />
+              </div>
+
+              {/* Right col — Professional */}
+              <div className="space-y-4">
+                <SelectField
+                  label="Department"
+                  name="Department"
+                  value={form.Department}
+                  onChange={handleChange}
+                  options={['Research & Development', 'Sales', 'Human Resources']}
+                />
+                <SelectField
+                  label="Job Role"
+                  name="JobRole"
+                  value={form.JobRole}
+                  onChange={handleChange}
+                  options={[
+                    'Healthcare Representative', 'Human Resources', 'Laboratory Technician',
+                    'Manager', 'Manufacturing Director', 'Research Director',
+                    'Research Scientist', 'Sales Executive', 'Sales Representative',
+                  ]}
+                />
+                <NumberField label="Monthly Income ($)" name="MonthlyIncome" value={form.MonthlyIncome} onChange={handleChange} prefix="$" />
+                {/* OverTime Toggle */}
+                <div className="p-4 bg-slate-50 border border-dashed border-slate-300 rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-label-md font-semibold text-on-surface block">OverTime Status</span>
+                      <span className="text-[10px] text-secondary">Does employee work extra hours?</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setForm((f) => ({ ...f, OverTime: f.OverTime === 'Yes' ? 'No' : 'Yes' }))}
+                      className={`w-12 h-6 rounded-full relative flex items-center px-1 transition-all ${form.OverTime === 'Yes' ? 'bg-primary' : 'bg-slate-300'}`}
+                    >
+                      <div className={`w-4 h-4 bg-white rounded-full shadow transition-all ${form.OverTime === 'Yes' ? 'ml-auto' : 'ml-0'}`} />
+                    </button>
+                  </div>
+                </div>
+                <label className="block">
+                  <span className="text-label-md font-label-md text-secondary mb-1 block uppercase">Job Level</span>
+                  <SegmentedButtons value={form.JobLevel} onChange={(v) => handleSegmented('JobLevel', v)} options={[1, 2, 3, 4, 5]} />
+                </label>
+                <label className="block">
+                  <span className="text-label-md font-label-md text-secondary mb-1 block uppercase">Stock Option Level</span>
+                  <SegmentedButtons value={form.StockOptionLevel} onChange={(v) => handleSegmented('StockOptionLevel', v)} options={[0, 1, 2, 3]} />
+                </label>
+              </div>
+            </div>
+
+            {/* Row 2: Satisfaction & Experience */}
+            <div>
+              <h4 className="text-label-md uppercase text-secondary mb-4 border-t border-slate-100 pt-4">Satisfaction & Experience</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <label className="block">
+                    <span className="text-label-md font-label-md text-secondary mb-1 block uppercase">Environment Satisfaction (1–4)</span>
+                    <SegmentedButtons value={form.EnvironmentSatisfaction} onChange={(v) => handleSegmented('EnvironmentSatisfaction', v)} options={[1, 2, 3, 4]} />
+                  </label>
+                  <label className="block">
+                    <span className="text-label-md font-label-md text-secondary mb-1 block uppercase">Job Satisfaction (1–4)</span>
+                    <SegmentedButtons value={form.JobSatisfaction} onChange={(v) => handleSegmented('JobSatisfaction', v)} options={[1, 2, 3, 4]} />
+                  </label>
+                  <label className="block">
+                    <span className="text-label-md font-label-md text-secondary mb-1 block uppercase">Relationship Satisfaction (1–4)</span>
+                    <SegmentedButtons value={form.RelationshipSatisfaction} onChange={(v) => handleSegmented('RelationshipSatisfaction', v)} options={[1, 2, 3, 4]} />
+                  </label>
+                  <label className="block">
+                    <span className="text-label-md font-label-md text-secondary mb-1 block uppercase">Work-Life Balance (1–4)</span>
+                    <SegmentedButtons value={form.WorkLifeBalance} onChange={(v) => handleSegmented('WorkLifeBalance', v)} options={[1, 2, 3, 4]} />
+                  </label>
+                  <label className="block">
+                    <span className="text-label-md font-label-md text-secondary mb-1 block uppercase">Job Involvement (1–4)</span>
+                    <SegmentedButtons value={form.JobInvolvement} onChange={(v) => handleSegmented('JobInvolvement', v)} options={[1, 2, 3, 4]} />
+                  </label>
+                </div>
+                <div className="space-y-4">
+                  <NumberField label="Total Working Years" name="TotalWorkingYears" value={form.TotalWorkingYears} onChange={handleChange} />
+                  <NumberField label="Years at Company" name="YearsAtCompany" value={form.YearsAtCompany} onChange={handleChange} />
+                  <NumberField label="Years in Current Role" name="YearsInCurrentRole" value={form.YearsInCurrentRole} onChange={handleChange} />
+                  <NumberField label="Years Since Last Promotion" name="YearsSinceLastPromotion" value={form.YearsSinceLastPromotion} onChange={handleChange} />
+                  <NumberField label="Years with Current Manager" name="YearsWithCurrManager" value={form.YearsWithCurrManager} onChange={handleChange} />
+                </div>
+              </div>
+            </div>
+
+            {/* Row 3: Compensation & Training */}
+            <div>
+              <h4 className="text-label-md uppercase text-secondary mb-4 border-t border-slate-100 pt-4">Compensation & Training</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <NumberField label="Daily Rate ($)" name="DailyRate" value={form.DailyRate} onChange={handleChange} prefix="$" />
+                  <NumberField label="Hourly Rate ($)" name="HourlyRate" value={form.HourlyRate} onChange={handleChange} prefix="$" />
+                  <NumberField label="Monthly Rate ($)" name="MonthlyRate" value={form.MonthlyRate} onChange={handleChange} prefix="$" />
+                  <NumberField label="Percent Salary Hike (%)" name="PercentSalaryHike" value={form.PercentSalaryHike} onChange={handleChange} />
+                </div>
+                <div className="space-y-4">
+                  <NumberField label="Num. Companies Worked" name="NumCompaniesWorked" value={form.NumCompaniesWorked} onChange={handleChange} />
+                  <NumberField label="Training Times Last Year" name="TrainingTimesLastYear" value={form.TrainingTimesLastYear} onChange={handleChange} />
+                  <label className="block">
+                    <span className="text-label-md font-label-md text-secondary mb-1 block uppercase">Performance Rating (1–4)</span>
+                    <SegmentedButtons value={form.PerformanceRating} onChange={(v) => handleSegmented('PerformanceRating', v)} options={[1, 2, 3, 4]} />
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="pt-6 flex items-center justify-end gap-4 border-t border-slate-200">
+              <button
+                type="button"
+                onClick={handleReset}
+                className="px-6 py-2.5 text-body-md font-bold text-secondary hover:bg-slate-100 rounded-lg transition-colors"
+              >
+                Clear Form
+              </button>
+              <button
+                type="submit"
+                disabled={loading}
+                className="px-8 py-2.5 bg-primary text-white text-body-md font-bold rounded-lg shadow-lg shadow-blue-900/20 flex items-center gap-2 hover:opacity-90 active:scale-95 transition-all disabled:opacity-60"
+              >
+                <span className="material-symbols-outlined text-[20px]">bolt</span>
+                {loading ? 'Predicting…' : 'Run Prediction'}
+              </button>
+            </div>
+
+            {error && (
+              <div className="mt-2 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-body-md">
+                <span className="material-symbols-outlined text-[16px] mr-2 align-middle">error</span>{error}
+              </div>
+            )}
+          </form>
+        </section>
+
+        {/* Right panel — 4 cols */}
+        <aside className="lg:col-span-4 space-y-6">
+          {/* Probability Card */}
+          <div className="bg-white border border-slate-200 rounded-xl p-6 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-blue-900/5 rounded-full -mr-16 -mt-16" />
+            <div className="relative z-10">
+              <h4 className="text-label-md font-semibold text-secondary uppercase tracking-wider mb-6">Attrition Probability</h4>
+              {result ? (
+                <>
+                  <div className="flex items-end gap-2 mb-4">
+                    <span className="text-[56px] font-black text-on-surface leading-none">{probability}</span>
+                    <span className="text-headline-lg text-secondary mb-1">%</span>
+                  </div>
+                  <div className="mb-6">
+                    <RiskBadge level={riskLevel} />
+                  </div>
+                  <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden mb-1">
+                    <div
+                      className={`h-full rounded-full transition-all duration-700 ${
+                        riskLevel === 'High' ? 'bg-red-500' : riskLevel === 'Medium' ? 'bg-amber-400' : 'bg-green-500'
+                      }`}
+                      style={{ width: `${probability}%` }}
+                    />
+                  </div>
+                  <div className="flex justify-between text-[10px] font-bold text-slate-400">
+                    <span>LOW</span><span>HIGH</span>
+                  </div>
+                </>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-8 text-slate-400">
+                  <span className="material-symbols-outlined text-[48px] mb-2">analytics</span>
+                  <p className="text-body-md text-center">Run a prediction to see the probability score here.</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Top Factors Card */}
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-6">
+            <div className="flex items-center gap-2 mb-6">
+              <span className="material-symbols-outlined text-primary text-[20px]">insights</span>
+              <h4 className="text-headline-md font-semibold text-on-surface">Top Risk Factors</h4>
+            </div>
+            {result ? (
+              <div className="space-y-4">
+                {factors.map((f) => (
+                  <div key={f.label} className="p-4 bg-white rounded-lg border border-slate-200 flex items-start gap-3">
+                    <div className={`w-8 h-8 rounded flex items-center justify-center flex-shrink-0 ${f.color}`}>
+                      <span className="material-symbols-outlined text-[18px]">{f.icon}</span>
+                    </div>
+                    <div>
+                      <p className="text-body-md font-bold text-on-surface">{f.label}</p>
+                      <p className="text-[12px] text-secondary leading-tight mt-1">{f.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-body-md text-slate-400 text-center py-4">Factors will appear after prediction.</p>
+            )}
+          </div>
+
+          {/* Model Info Card */}
+          <div className="bg-white border border-slate-200 rounded-xl p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <span className="material-symbols-outlined text-primary text-[20px]">model_training</span>
+              <h4 className="text-headline-md font-semibold text-on-surface">Active Model</h4>
+            </div>
+            <dl className="space-y-2 text-body-md">
+              <div className="flex justify-between"><dt className="text-secondary">Algorithm</dt><dd className="font-semibold">Logistic Regression</dd></div>
+              <div className="flex justify-between"><dt className="text-secondary">Threshold</dt><dd className="font-semibold">0.25</dd></div>
+              <div className="flex justify-between"><dt className="text-secondary">Test AUC</dt><dd className="font-semibold text-blue-700">0.800</dd></div>
+              <div className="flex justify-between"><dt className="text-secondary">Test F1</dt><dd className="font-semibold text-blue-700">0.595</dd></div>
+              <div className="flex justify-between"><dt className="text-secondary">Recall</dt><dd className="font-semibold">0.611</dd></div>
+            </dl>
+          </div>
+        </aside>
+      </div>
+    </div>
+  )
+}

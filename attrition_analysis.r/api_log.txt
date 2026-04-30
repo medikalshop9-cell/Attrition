@@ -1,0 +1,7 @@
+==============================================
+  Attrition Prediction API
+  http://localhost:8000
+  GET  /health
+  POST /predict
+==============================================
+

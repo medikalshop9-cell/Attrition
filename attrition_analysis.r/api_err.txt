@@ -1,0 +1,21 @@
+Warning message:
+package 'plumber' was built under R version 4.5.3 
+
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+Loading required package: ggplot2
+Loading required package: lattice
+Warning messages:
+1: package 'dplyr' was built under R version 4.5.2 
+2: package 'caret' was built under R version 4.5.2 
+Running plumber API at http://0.0.0.0:8000
+Running swagger Docs at http://127.0.0.1:8000/__docs__/
+^C

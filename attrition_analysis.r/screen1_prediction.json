@@ -1,0 +1,28 @@
+﻿{
+    "id":  3,
+    "jsonrpc":  "2.0",
+    "result":  {
+                   "content":  [
+                                   {
+                                       "text":  "{\"name\":\"projects/6257650906793362372/screens/bab74a513032470a83cb1f76cd4b7c27\",\"title\":\"Employee Prediction Tool\",\"screenshot\":{\"name\":\"projects/6257650906793362372/files/ebc2bada15244425a705f2ef217cffe4\",\"downloadUrl\":\"https://lh3.googleusercontent.com/aida/ADBb0uj29KhJEIF-fft3EfGookzd1SF5QixPR-XqHTrjyjlA9imyT-m0Xn4lkv6BohlC692dbL9uN0TAbVfOZG8_OPCiZaGKJfAh2d1yPdMoiXT_0O6oOHURPa6BArq9NpHobu47wbLliEdyMkCuJCXt58aMei3ilb6qn1KgZo7H8J_ITqrCVPnyJgxFw_rjniwzBnDQ3qnfuXI9qUxmE_cMsD4sS1k04pWUTglxrhPfJbYDYFdB3Fkgl9s4ZDA\"},\"htmlCode\":{\"name\":\"projects/6257650906793362372/files/14a6c8ae3ee44057a33aae7a5ea8a4b4\",\"downloadUrl\":\"https://contribution.usercontent.google.com/download?c=CgthaWRhX2NvZGVmeBJ7Eh1hcHBfY29tcGFuaW9uX2dlbmVyYXRlZF9maWxlcxpaCiVodG1sXzlmMDZkMjhjMGUwOTQ0YjI4MmUyZGEzZjk1MTU5MGQ2EgsSBxCPkMzkhw0YAZIBIwoKcHJvamVjdF9pZBIVQhM2MjU3NjUwOTA2NzkzMzYyMzcy\u0026filename=\u0026opi=89354086\",\"mimeType\":\"text/html\"},\"width\":\"2560\",\"height\":\"2642\",\"deviceType\":\"DESKTOP\"}",
+                                       "type":  "text"
+                                   }
+                               ],
+                   "structuredContent":  {
+                                             "deviceType":  "DESKTOP",
+                                             "height":  "2642",
+                                             "htmlCode":  {
+                                                              "downloadUrl":  "https://contribution.usercontent.google.com/download?c=CgthaWRhX2NvZGVmeBJ7Eh1hcHBfY29tcGFuaW9uX2dlbmVyYXRlZF9maWxlcxpaCiVodG1sXzlmMDZkMjhjMGUwOTQ0YjI4MmUyZGEzZjk1MTU5MGQ2EgsSBxCPkMzkhw0YAZIBIwoKcHJvamVjdF9pZBIVQhM2MjU3NjUwOTA2NzkzMzYyMzcy\u0026filename=\u0026opi=89354086",
+                                                              "mimeType":  "text/html",
+                                                              "name":  "projects/6257650906793362372/files/14a6c8ae3ee44057a33aae7a5ea8a4b4"
+                                                          },
+                                             "name":  "projects/6257650906793362372/screens/bab74a513032470a83cb1f76cd4b7c27",
+                                             "screenshot":  {
+                                                                "downloadUrl":  "https://lh3.googleusercontent.com/aida/ADBb0uj29KhJEIF-fft3EfGookzd1SF5QixPR-XqHTrjyjlA9imyT-m0Xn4lkv6BohlC692dbL9uN0TAbVfOZG8_OPCiZaGKJfAh2d1yPdMoiXT_0O6oOHURPa6BArq9NpHobu47wbLliEdyMkCuJCXt58aMei3ilb6qn1KgZo7H8J_ITqrCVPnyJgxFw_rjniwzBnDQ3qnfuXI9qUxmE_cMsD4sS1k04pWUTglxrhPfJbYDYFdB3Fkgl9s4ZDA",
+                                                                "name":  "projects/6257650906793362372/files/ebc2bada15244425a705f2ef217cffe4"
+                                                            },
+                                             "title":  "Employee Prediction Tool",
+                                             "width":  "2560"
+                                         }
+               }
+}

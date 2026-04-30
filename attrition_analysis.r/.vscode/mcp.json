@@ -1,0 +1,49 @@
+{
+  "servers": {
+    "stitch": {
+      "type": "http",
+      "url": "https://stitch.googleapis.com/mcp",
+      "headers": {
+        "X-Goog-Api-Key": "AQ.Ab8RN6KgRrJh0KXnO7-l7515fg_jR4h69QDKdDkmLYX1TaxTdQ"
+      }
+    }
+  }
+}
+
+{
+  "servers": {
+    "stitch": {
+      "type": "http",
+      "url": "https://stitch.googleapis.com/mcp",
+      "headers": {
+        "X-Goog-Api-Key": "AQ.Ab8RN6KgRrJh0KXnO7-l7515fg_jR4h69QDKdDkmLYX1TaxTdQ"
+      }
+    }
+  }
+}
+
+
+{
+  "servers": {
+    "stitch": {
+      "type": "http",
+      "url": "https://stitch.googleapis.com/mcp",
+      "headers": {
+        "X-Goog-Api-Key": "AQ.Ab8RN6KgRrJh0KXnO7-l7515fg_jR4h69QDKdDkmLYX1TaxTdQ"
+      }
+    }
+  }
+}
+
+
+{
+  "servers": {
+    "stitch": {
+      "type": "http",
+      "url": "https://stitch.googleapis.com/mcp",
+      "headers": {
+        "X-Goog-Api-Key": "AQ.Ab8RN6KgRrJh0KXnO7-l7515fg_jR4h69QDKdDkmLYX1TaxTdQ"
+      }
+    }
+  }
+}
