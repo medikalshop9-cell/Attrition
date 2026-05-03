@@ -70,10 +70,10 @@ function SegmentedButtons({ value, onChange, options }) {
           type="button"
           whileTap={{ scale: 0.92 }}
           onClick={() => onChange(opt)}
-          className={`flex-1 py-2 rounded-lg text-xs font-bold transition-colors border ${
+          className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all border ${
             value === opt
-              ? 'border-primary text-primary bg-blue-50'
-              : 'border-outline-variant text-slate-600 bg-white hover:bg-slate-50'
+              ? 'border-primary text-primary bg-blue-50 dark:bg-blue-900/30 dark:border-blue-500 dark:text-blue-400 shadow-sm'
+              : 'border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700'
           }`}
         >
           {opt}
@@ -86,12 +86,12 @@ function SegmentedButtons({ value, onChange, options }) {
 function SelectField({ label, name, value, onChange, options }) {
   return (
     <label className="block">
-      <span className="text-label-md font-label-md text-secondary mb-1 block uppercase">{label}</span>
+      <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1.5 block uppercase tracking-wider">{label}</span>
       <select
         name={name}
         value={value}
         onChange={onChange}
-        className="w-full bg-white border border-outline-variant rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary focus:border-primary text-body-md outline-none"
+        className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-primary/30 focus:border-primary text-sm text-slate-800 dark:text-slate-200 outline-none transition-all appearance-none cursor-pointer shadow-sm"
       >
         {options.map((o) => (
           <option key={o.value ?? o} value={o.value ?? o}>{o.label ?? o}</option>
@@ -104,17 +104,17 @@ function SelectField({ label, name, value, onChange, options }) {
 function NumberField({ label, name, value, onChange, prefix }) {
   return (
     <label className="block">
-      <span className="text-label-md font-label-md text-secondary mb-1 block uppercase">{label}</span>
+      <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1.5 block uppercase tracking-wider">{label}</span>
       <div className="relative">
         {prefix && (
-          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">{prefix}</span>
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">{prefix}</span>
         )}
         <input
           type="number"
           name={name}
           value={value}
           onChange={onChange}
-          className={`w-full bg-white border border-outline-variant rounded-lg ${prefix ? 'pl-8 pr-4' : 'px-4'} py-2.5 focus:ring-2 focus:ring-primary focus:border-primary text-body-md outline-none`}
+          className={`w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl ${prefix ? 'pl-8 pr-4' : 'px-4'} py-2.5 focus:ring-2 focus:ring-primary/30 focus:border-primary text-sm text-slate-800 dark:text-slate-200 outline-none transition-all shadow-sm`}
         />
       </div>
     </label>
@@ -197,38 +197,38 @@ export default function PredictionTool() {
     <div>
       {/* Breadcrumb + Title */}
       <div className="mb-8">
-        <nav className="flex items-center gap-2 text-label-md text-slate-400 mb-2 uppercase">
+        <nav className="flex items-center gap-2 text-[11px] text-slate-400 mb-3 uppercase tracking-widest font-semibold">
           <span>Analytics</span>
           <span className="material-symbols-outlined text-[14px]">chevron_right</span>
-          <span className="text-blue-700">Attrition Prediction Tool</span>
+          <span className="text-blue-600 dark:text-blue-400">Attrition Prediction Tool</span>
         </nav>
-        <h2 className="text-headline-xl font-bold text-on-surface">Predict Employee Churn</h2>
-        <p className="text-body-md text-secondary mt-1">Input employee metrics to calculate risk probability based on historical data patterns.</p>
+        <h2 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white">Predict Employee Churn</h2>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">Input employee metrics to calculate risk probability based on historical data patterns.</p>
       </div>
 
       {/* Bento Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Form — left 8 cols */}
-        <section className="lg:col-span-8 bg-white border border-slate-200 rounded-xl overflow-hidden">
-          <div className="p-6 border-b border-slate-200 flex items-center justify-between bg-white">
-            <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-primary">person_search</span>
-              <h3 className="text-headline-md font-semibold text-on-surface">Employee Profile Details</h3>
+        <section className="lg:col-span-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+          <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/60 dark:bg-slate-900/60">
+            <div className="flex items-center gap-2.5">
+              <span className="material-symbols-outlined text-primary dark:text-blue-400">person_search</span>
+              <h3 className="text-base font-bold text-slate-800 dark:text-slate-200">Employee Profile Details</h3>
             </div>
-            <span className="text-label-md text-secondary bg-slate-100 px-3 py-1 rounded-full uppercase">Active Model: LR v1.0</span>
+            <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-800 px-3 py-1 rounded-full border border-slate-200 dark:border-slate-700 uppercase tracking-wide">Active Model: LR v1.0</span>
           </div>
 
           <form onSubmit={handleSubmit} className="p-6 space-y-8">
             {/* Employee Name (metadata, not a model feature) */}
             <div>
               <label className="block">
-                <span className="text-label-md font-label-md text-secondary mb-1 block uppercase">Employee Name <span className="text-[10px] normal-case font-normal text-slate-400">(optional — for record-keeping)</span></span>
+                <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1.5 block uppercase tracking-wider">Employee Name <span className="text-[10px] normal-case font-normal text-slate-400">(optional — for record-keeping)</span></span>
                 <input
                   type="text"
                   value={employeeName}
                   onChange={(e) => setEmployeeName(e.target.value)}
                   placeholder="e.g. Jane Smith"
-                  className="w-full bg-white border border-outline-variant rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary focus:border-primary text-body-md outline-none"
+                  className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-primary/30 focus:border-primary text-sm text-slate-800 dark:text-slate-200 outline-none transition-all shadow-sm placeholder:text-slate-400"
                 />
               </label>
             </div>
@@ -246,7 +246,7 @@ export default function PredictionTool() {
                   options={['Travel_Rarely', 'Travel_Frequently', 'Non-Travel']}
                 />
                 <label className="block">
-                  <span className="text-label-md font-label-md text-secondary mb-1 block uppercase">Education Level</span>
+                  <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1.5 block uppercase tracking-wider">Education Level</span>
                   <SegmentedButtons
                     value={form.Education}
                     onChange={(v) => handleSegmented('Education', v)}
@@ -254,15 +254,15 @@ export default function PredictionTool() {
                   />
                 </label>
                 <label className="block">
-                  <span className="text-label-md font-label-md text-secondary mb-1 block uppercase">Distance From Home (km)</span>
+                  <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1.5 block uppercase tracking-wider">Distance From Home (km)</span>
                   <input
                     type="range" name="DistanceFromHome" min={1} max={50}
                     value={form.DistanceFromHome}
                     onChange={(e) => setForm((f) => ({ ...f, DistanceFromHome: Number(e.target.value) }))}
-                    className="w-full h-1.5 bg-slate-200 rounded-full appearance-none cursor-pointer accent-primary"
+                    className="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full appearance-none cursor-pointer accent-primary"
                   />
                   <div className="flex justify-between text-[10px] text-slate-400 mt-1">
-                    <span>1 km</span><span className="font-semibold text-slate-600">{form.DistanceFromHome} km</span><span>50 km</span>
+                    <span>1 km</span><span className="font-semibold text-slate-600 dark:text-slate-300">{form.DistanceFromHome} km</span><span>50 km</span>
                   </div>
                 </label>
                 <SelectField
@@ -303,11 +303,11 @@ export default function PredictionTool() {
                 />
                 <NumberField label="Monthly Income ($)" name="MonthlyIncome" value={form.MonthlyIncome} onChange={handleChange} prefix="$" />
                 {/* OverTime Toggle */}
-                <div className="p-4 bg-slate-50 border border-dashed border-slate-300 rounded-lg">
+                <div className="p-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl">
                   <div className="flex items-center justify-between">
                     <div>
-                      <span className="text-label-md font-semibold text-on-surface block">OverTime Status</span>
-                      <span className="text-[10px] text-secondary">Does employee work extra hours?</span>
+                      <span className="text-sm font-semibold text-slate-800 dark:text-slate-200 block">OverTime Status</span>
+                      <span className="text-[11px] text-slate-500 dark:text-slate-400">Does employee work extra hours?</span>
                     </div>
                     <motion.button
                       type="button"
@@ -324,7 +324,7 @@ export default function PredictionTool() {
                   </div>
                 </div>
                 <label className="block">
-                  <span className="text-label-md font-label-md text-secondary mb-1 block uppercase">Stock Option Level</span>
+                  <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1.5 block uppercase tracking-wider">Stock Option Level</span>
                   <SegmentedButtons value={form.StockOptionLevel} onChange={(v) => handleSegmented('StockOptionLevel', v)} options={[0, 1, 2, 3]} />
                 </label>
               </div>
@@ -332,15 +332,15 @@ export default function PredictionTool() {
 
             {/* Row 2: Experience & Engagement */}
             <div>
-              <h4 className="text-label-md uppercase text-secondary mb-4 border-t border-slate-100 pt-4">Engagement & Tenure</h4>
+              <h4 className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-4 border-t border-slate-100 dark:border-slate-800 pt-5">Engagement &amp; Tenure</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
-                  <label className="block">
-                    <span className="text-label-md font-label-md text-secondary mb-1 block uppercase">Work-Life Balance (1–4)</span>
+                <label className="block">
+                  <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1.5 block uppercase tracking-wider">Work-Life Balance (1–4)</span>
                     <SegmentedButtons value={form.WorkLifeBalance} onChange={(v) => handleSegmented('WorkLifeBalance', v)} options={[1, 2, 3, 4]} />
                   </label>
-                  <label className="block">
-                    <span className="text-label-md font-label-md text-secondary mb-1 block uppercase">Job Involvement (1–4)</span>
+                <label className="block">
+                  <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1.5 block uppercase tracking-wider">Job Involvement (1–4)</span>
                     <SegmentedButtons value={form.JobInvolvement} onChange={(v) => handleSegmented('JobInvolvement', v)} options={[1, 2, 3, 4]} />
                   </label>
                   <NumberField label="Years at Company" name="YearsAtCompany" value={form.YearsAtCompany} onChange={handleChange} />
@@ -355,7 +355,7 @@ export default function PredictionTool() {
 
             {/* Row 3: Compensation & Training */}
             <div>
-              <h4 className="text-label-md uppercase text-secondary mb-4 border-t border-slate-100 pt-4">Compensation & Training</h4>
+              <h4 className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-4 border-t border-slate-100 dark:border-slate-800 pt-5">Compensation &amp; Training</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
                   <NumberField label="Daily Rate ($)" name="DailyRate" value={form.DailyRate} onChange={handleChange} prefix="$" />
@@ -366,8 +366,8 @@ export default function PredictionTool() {
                 <div className="space-y-4">
                   <NumberField label="Num. Companies Worked" name="NumCompaniesWorked" value={form.NumCompaniesWorked} onChange={handleChange} />
                   <NumberField label="Training Times Last Year" name="TrainingTimesLastYear" value={form.TrainingTimesLastYear} onChange={handleChange} />
-                  <label className="block">
-                    <span className="text-label-md font-label-md text-secondary mb-1 block uppercase">Performance Rating (1–4)</span>
+                <label className="block">
+                  <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1.5 block uppercase tracking-wider">Performance Rating (1–4)</span>
                     <SegmentedButtons value={form.PerformanceRating} onChange={(v) => handleSegmented('PerformanceRating', v)} options={[1, 2, 3, 4]} />
                   </label>
                 </div>
@@ -375,13 +375,13 @@ export default function PredictionTool() {
             </div>
 
             {/* Actions */}
-            <div className="pt-6 flex items-center justify-end gap-4 border-t border-slate-200">
+            <div className="pt-6 flex items-center justify-end gap-4 border-t border-slate-200 dark:border-slate-800">
               <motion.button type="button" whileTap={{ scale: 0.96 }} onClick={handleReset}
-                className="px-6 py-2.5 text-body-md font-bold text-secondary hover:bg-slate-100 rounded-lg transition-colors">
+                className="px-6 py-2.5 text-sm font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors">
                 Clear Form
               </motion.button>
               <motion.button type="submit" disabled={loading} whileTap={{ scale: 0.96 }}
-                className="px-8 py-2.5 bg-primary text-white text-body-md font-bold rounded-lg shadow-lg shadow-blue-900/20 flex items-center gap-2 hover:opacity-90 transition-all disabled:opacity-60">
+                className="px-8 py-2.5 bg-primary text-white text-sm font-bold rounded-xl shadow-lg shadow-blue-900/20 flex items-center gap-2 hover:bg-blue-800 hover:-translate-y-0.5 transition-all disabled:opacity-60">
                 {loading
                   ? <><span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />Predicting…</>
                   : <><span className="material-symbols-outlined text-[20px]">bolt</span>Run Prediction</>
@@ -392,7 +392,7 @@ export default function PredictionTool() {
             <AnimatePresence>
               {error && (
                 <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-                  className="mt-2 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-body-md">
+                  className="mt-2 p-4 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-xl text-red-700 dark:text-red-400 text-sm">
                   <span className="material-symbols-outlined text-[16px] mr-2 align-middle">error</span>{error}
                 </motion.div>
               )}
@@ -407,46 +407,46 @@ export default function PredictionTool() {
             {result ? (
               <PredictionResultCard key={result.probability} result={result} />
             ) : (
-              <motion.div key="empty" className="bg-white border border-slate-200 rounded-xl p-6"
+              <motion.div key="empty" className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm p-6"
                 initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                <p className="text-label-md uppercase text-secondary mb-6">Attrition Probability</p>
+                <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-6">Attrition Probability</p>
                 <div className="flex flex-col items-center justify-center py-8 text-slate-400">
-                  <motion.span className="material-symbols-outlined text-[48px] mb-2"
+                  <motion.span className="material-symbols-outlined text-[48px] mb-3 text-slate-300"
                     animate={{ scale: [1, 1.08, 1] }} transition={{ repeat: Infinity, duration: 2.5, ease: 'easeInOut' }}>
                     analytics
                   </motion.span>
-                  <p className="text-body-md text-center">Run a prediction to see the probability score here.</p>
+                  <p className="text-sm text-center text-slate-400">Run a prediction to see the probability score here.</p>
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
 
           {/* Top Factors Card */}
-          <motion.div className="bg-slate-50 border border-slate-200 rounded-xl p-6"
+          <motion.div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm p-6"
             initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
-            <div className="flex items-center gap-2 mb-6">
-              <span className="material-symbols-outlined text-primary text-[20px]">insights</span>
-              <h4 className="text-headline-md font-semibold text-on-surface">Top Risk Factors</h4>
+            <div className="flex items-center gap-2 mb-5">
+              <span className="material-symbols-outlined text-primary dark:text-blue-400 text-[20px]">insights</span>
+              <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200">Top Risk Factors</h4>
             </div>
             <AnimatePresence mode="wait">
               {result ? (
                 <motion.div key="factors-list" className="space-y-3">
                   {factors.map((f, i) => (
                     <motion.div key={f.label} custom={i} variants={fadeUp} initial="hidden" animate="show"
-                      className="p-4 bg-white rounded-lg border border-slate-200 flex items-start gap-3">
-                      <div className={`w-8 h-8 rounded flex items-center justify-center flex-shrink-0 ${f.color}`}>
+                      className="p-3.5 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-700/50 flex items-start gap-3 transition-colors hover:border-slate-200 dark:hover:border-slate-600">
+                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${f.color}`}>
                         <span className="material-symbols-outlined text-[18px]">{f.icon}</span>
                       </div>
                       <div>
-                        <p className="text-body-md font-bold text-on-surface">{f.label}</p>
-                        <p className="text-[12px] text-secondary leading-tight mt-1">{f.desc}</p>
+                        <p className="text-[13px] font-bold text-slate-800 dark:text-slate-200">{f.label}</p>
+                        <p className="text-[12px] text-slate-500 dark:text-slate-400 leading-relaxed mt-0.5">{f.desc}</p>
                       </div>
                     </motion.div>
                   ))}
                 </motion.div>
               ) : (
                 <motion.p key="empty-factors" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                  className="text-body-md text-slate-400 text-center py-4">
+                  className="text-sm text-slate-400 text-center py-4">
                   Factors will appear after prediction.
                 </motion.p>
               )}
@@ -454,36 +454,36 @@ export default function PredictionTool() {
           </motion.div>
 
           {/* Model Info Card */}
-          <div className="bg-white border border-slate-200 rounded-xl p-6">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm p-6">
             <div className="flex items-center gap-2 mb-4">
-              <span className="material-symbols-outlined text-primary text-[20px]">model_training</span>
-              <h4 className="text-headline-md font-semibold text-on-surface">Active Model</h4>
+              <span className="material-symbols-outlined text-primary dark:text-blue-400 text-[20px]">model_training</span>
+              <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200">Active Model</h4>
             </div>
-            <dl className="space-y-2 text-body-md mb-5">
-              <div className="flex justify-between"><dt className="text-secondary">Algorithm</dt><dd className="font-semibold">Logistic Regression</dd></div>
-              <div className="flex justify-between"><dt className="text-secondary">Test AUC</dt><dd className="font-semibold text-blue-700">0.780</dd></div>
-              <div className="flex justify-between"><dt className="text-secondary">Test F1</dt><dd className="font-semibold text-blue-700">0.615</dd></div>
-              <div className="flex justify-between"><dt className="text-secondary">Recall</dt><dd className="font-semibold">0.667</dd></div>
-              <div className="flex justify-between"><dt className="text-secondary">Threshold</dt><dd className="font-semibold">0.26</dd></div>
+            <dl className="space-y-2.5 text-sm mb-5">
+              <div className="flex justify-between"><dt className="text-slate-500 dark:text-slate-400">Algorithm</dt><dd className="font-bold text-slate-800 dark:text-slate-200">Logistic Regression</dd></div>
+              <div className="flex justify-between"><dt className="text-slate-500 dark:text-slate-400">Test AUC</dt><dd className="font-bold text-blue-700 dark:text-blue-400">0.780</dd></div>
+              <div className="flex justify-between"><dt className="text-slate-500 dark:text-slate-400">Test F1</dt><dd className="font-bold text-blue-700 dark:text-blue-400">0.615</dd></div>
+              <div className="flex justify-between"><dt className="text-slate-500 dark:text-slate-400">Recall</dt><dd className="font-bold text-slate-800 dark:text-slate-200">0.667</dd></div>
+              <div className="flex justify-between"><dt className="text-slate-500 dark:text-slate-400">Threshold</dt><dd className="font-bold text-slate-800 dark:text-slate-200">0.26</dd></div>
             </dl>
             {/* Threshold slider */}
-            <div className="border-t border-slate-100 pt-4">
+            <div className="border-t border-slate-100 dark:border-slate-800 pt-4">
               <div className="flex justify-between items-center mb-2">
-                <span className="text-label-md uppercase text-secondary">Risk Threshold</span>
-                <span className="text-label-md font-bold text-primary tabular-nums">{threshold.toFixed(2)}</span>
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Risk Threshold</span>
+                <span className="text-sm font-bold text-primary dark:text-blue-400 tabular-nums">{threshold.toFixed(2)}</span>
               </div>
               <input
                 type="range"
                 min={0.05} max={0.95} step={0.01}
                 value={threshold}
                 onChange={(e) => setThreshold(Number(e.target.value))}
-                className="w-full h-1.5 bg-slate-200 rounded-full appearance-none cursor-pointer accent-primary"
+                className="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full appearance-none cursor-pointer accent-primary"
               />
               <div className="flex justify-between text-[10px] text-slate-400 mt-1">
                 <span>0.05 (sensitive)</span>
                 <span>0.95 (conservative)</span>
               </div>
-              <p className="text-[11px] text-secondary mt-2">Probability ≥ threshold → predicts attrition. Drag to adjust sensitivity.</p>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2">Probability ≥ threshold → predicts attrition. Drag to adjust sensitivity.</p>
             </div>
           </div>
         </aside>

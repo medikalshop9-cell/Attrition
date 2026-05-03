@@ -5,7 +5,7 @@ export default function Header({ placeholder = 'Search employees...' }) {
   return (
     <header className="flex justify-between items-center pl-16 pr-6 md:px-6 h-16 w-full sticky top-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-700 z-40 font-inter antialiased text-sm">
       <div className="flex items-center gap-6">
-        <span className="text-lg font-bold tracking-tight text-blue-900 dark:text-blue-300">WorkforceX Insights</span>
+        <span className="text-lg font-bold tracking-tight text-blue-900 dark:text-blue-300">Retention AI</span>
         <div className="hidden lg:flex items-center bg-slate-100 dark:bg-slate-800 rounded-full px-4 py-1.5 gap-2 border border-slate-200 dark:border-slate-600">
           <span className="material-symbols-outlined text-slate-400 text-sm">search</span>
           <input

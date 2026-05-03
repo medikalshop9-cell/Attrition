@@ -13,7 +13,7 @@ export function Tooltip({ children, content, side = 'top' }) {
             side={side}
             sideOffset={6}
             className={cn(
-              'z-50 px-3 py-1.5 text-xs font-medium text-white bg-slate-800 rounded-lg shadow-lg',
+              'z-50 px-3 py-1.5 text-xs font-semibold text-white bg-slate-900 dark:bg-slate-700 rounded-lg shadow-xl border border-slate-700 dark:border-slate-600',
               'animate-in fade-in-0 zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2'
             )}
           >

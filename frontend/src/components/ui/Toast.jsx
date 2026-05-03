@@ -11,9 +11,9 @@ const ICONS = {
   info: <Info size={18} className="text-blue-600 shrink-0" />,
 }
 const BORDER = {
-  success: 'border-green-200 bg-green-50',
-  error: 'border-red-200 bg-red-50',
-  info: 'border-blue-200 bg-blue-50',
+  success: 'border-green-200 dark:border-green-500/30 bg-white dark:bg-slate-900 shadow-lg shadow-green-100/50',
+  error: 'border-red-200 dark:border-red-500/30 bg-white dark:bg-slate-900 shadow-lg shadow-red-100/50',
+  info: 'border-blue-200 dark:border-blue-500/30 bg-white dark:bg-slate-900 shadow-lg shadow-blue-100/50',
 }
 
 function ToastItem({ id, type = 'info', title, message, onDismiss }) {
@@ -30,14 +30,14 @@ function ToastItem({ id, type = 'info', title, message, onDismiss }) {
       exit={{ opacity: 0, y: 16, scale: 0.95 }}
       transition={{ type: 'spring', duration: 0.4, bounce: 0.2 }}
       className={cn(
-        'w-80 flex items-start gap-3 px-4 py-3 rounded-xl border shadow-lg backdrop-blur-sm',
+        'w-80 flex items-start gap-3 px-4 py-3.5 rounded-2xl border backdrop-blur-sm',
         BORDER[type]
       )}
     >
       {ICONS[type]}
       <div className="flex-1 min-w-0">
-        {title && <p className="text-sm font-bold text-slate-800 leading-snug">{title}</p>}
-        {message && <p className="text-xs text-slate-600 leading-snug mt-0.5">{message}</p>}
+        {title && <p className="text-sm font-bold text-slate-900 dark:text-slate-100 leading-snug">{title}</p>}
+        {message && <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mt-0.5">{message}</p>}
       </div>
       <button onClick={() => onDismiss(id)} className="text-slate-400 hover:text-slate-600 transition-colors shrink-0 mt-0.5">
         <X size={14} />
