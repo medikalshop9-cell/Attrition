@@ -15,7 +15,7 @@ function NavContent({ onClose }) {
       {/* Branding */}
       <div className="px-6 mb-8 flex items-start justify-between">
         <div>
-          <h1 className="text-xl font-black text-blue-900 dark:text-blue-300">WorkforceX Insights</h1>
+          <h1 className="text-xl font-black text-blue-900 dark:text-blue-300">Retention AI</h1>
           <p className="text-[10px] uppercase tracking-widest text-slate-400 dark:text-slate-500 mt-1">Enterprise Analytics</p>
         </div>
         {onClose && (
