@@ -4,11 +4,11 @@
 outputs/
 .vite/
 node_modules/
-*.rds
-*.csv
-*.log
 *.txt
-outputs/
 .Rhistory
 .RData
 rsconnect/
+
+# Allow API model files needed by Railway/Render deployments
+!attrition_analysis.r/plumber_api/model_final.rds
+!attrition_analysis.r/plumber_api/scaling_params.rds
