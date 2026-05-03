@@ -27,3 +27,32 @@ export async function getInsights() {
   const { data } = await client.get('/insights')
   return data
 }
+
+/**
+ * GET /feature_importance
+ * @returns feature_importance.json (Phase 12 analysis)
+ */
+export async function getFeatureImportance() {
+  const { data } = await client.get('/feature_importance')
+  return data
+}
+
+/**
+ * GET /shap_metadata
+ * @returns shap_metadata.json (intercept, betas, beeswarm data)
+ */
+export async function getSHAPMetadata() {
+  const { data } = await client.get('/shap_metadata')
+  return data
+}
+
+/**
+ * POST /shap
+ * Computes LinearSHAP values for a single employee server-side.
+ * @param {Object} employeeData - same 30-field payload as /predict
+ * @returns {{ risk_score, risk_label, baseline_prob, intercept, shap_values[] }}
+ */
+export async function getSHAPExplanation(employeeData) {
+  const { data } = await client.post('/shap', employeeData)
+  return data
+}

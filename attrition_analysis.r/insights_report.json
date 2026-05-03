@@ -1,103 +1,103 @@
 {
-  "generated_at": "2026-04-30T18:07:14Z",
+  "generated_at": "2026-05-03T00:39:59Z",
   "model": "Logistic Regression",
   "threshold": 0.25,
   "test_metrics": {
-    "accuracy": 0.8636,
-    "precision": 0.5789,
-    "recall": 0.6111,
-    "f1": 0.5946,
-    "auc": 0.8
+    "accuracy": 0.8591,
+    "precision": 0.5581,
+    "recall": 0.6667,
+    "f1": 0.6076,
+    "auc": 0.776
   },
   "confusion_matrix": {
-    "tn": 168,
-    "fp": 14,
-    "fn": 16,
-    "tp": 22
+    "tn": 165,
+    "fp": 19,
+    "fn": 12,
+    "tp": 24
   },
   "top_predictors": [
     {
-      "feature": "`JobRole.Human Resources`",
-      "label": "JobRole: Human Resources",
-      "coefficient": 15.3317,
-      "coeff_fmt": "+15.33",
-      "direction": "risk"
-    },
-    {
-      "feature": "`Department.Research & Development`",
-      "label": "Department: R&D",
-      "coefficient": 13.8337,
-      "coeff_fmt": "+13.83",
-      "direction": "risk"
-    },
-    {
-      "feature": "Department.Sales",
-      "label": "Department: Sales",
-      "coefficient": 13.2954,
-      "coeff_fmt": "+13.30",
-      "direction": "risk"
-    },
-    {
-      "feature": "`JobRole.Sales Representative`",
-      "label": "JobRole: Sales Representative",
-      "coefficient": 2.5498,
-      "coeff_fmt": "+2.55",
-      "direction": "risk"
-    },
-    {
       "feature": "OverTime",
-      "label": "OverTime = Yes",
-      "coefficient": 2.0467,
-      "coeff_fmt": "+2.05",
+      "label": "OverTime",
+      "coefficient": 1.7004,
+      "coeff_fmt": "+1.70",
       "direction": "risk"
     },
     {
-      "feature": "`JobRole.Laboratory Technician`",
-      "label": "JobRole: Lab Technician",
-      "coefficient": 1.8173,
-      "coeff_fmt": "+1.82",
+      "feature": "`JobRole.Manufacturing Director`",
+      "label": "JobRole: Manufacturing Director",
+      "coefficient": -1.1573,
+      "coeff_fmt": "−1.16",
+      "direction": "protect"
+    },
+    {
+      "feature": "`JobRole.Research Director`",
+      "label": "JobRole: Research Director",
+      "coefficient": -1.1045,
+      "coeff_fmt": "−1.10",
+      "direction": "protect"
+    },
+    {
+      "feature": "EducationField.Medical",
+      "label": "EducationField: Medical",
+      "coefficient": -1.0291,
+      "coeff_fmt": "−1.03",
+      "direction": "protect"
+    },
+    {
+      "feature": "MonthlyIncome",
+      "label": "MonthlyIncome",
+      "coefficient": -0.9223,
+      "coeff_fmt": "−0.92",
+      "direction": "protect"
+    },
+    {
+      "feature": "`EducationField.Life Sciences`",
+      "label": "EducationField: Life Sciences",
+      "coefficient": -0.8791,
+      "coeff_fmt": "−0.88",
+      "direction": "protect"
+    },
+    {
+      "feature": "MaritalStatus.Single",
+      "label": "MaritalStatus: Single",
+      "coefficient": 0.8745,
+      "coeff_fmt": "+0.87",
       "direction": "risk"
     },
     {
-      "feature": "`JobRole.Sales Executive`",
-      "label": "JobRole: Sales Executive",
-      "coefficient": 1.8142,
-      "coeff_fmt": "+1.81",
+      "feature": "EducationField.Other",
+      "label": "EducationField: Other",
+      "coefficient": -0.8722,
+      "coeff_fmt": "−0.87",
+      "direction": "protect"
+    },
+    {
+      "feature": "BusinessTravel",
+      "label": "BusinessTravel",
+      "coefficient": 0.7716,
+      "coeff_fmt": "+0.77",
+      "direction": "risk"
+    },
+    {
+      "feature": "TenureGroup",
+      "label": "TenureGroup",
+      "coefficient": -0.5678,
+      "coeff_fmt": "−0.57",
+      "direction": "protect"
+    },
+    {
+      "feature": "YearsAtCompany",
+      "label": "YearsAtCompany",
+      "coefficient": 0.5426,
+      "coeff_fmt": "+0.54",
       "direction": "risk"
     },
     {
       "feature": "JobRole.Manager",
       "label": "JobRole: Manager",
-      "coefficient": 1.065,
-      "coeff_fmt": "+1.07",
-      "direction": "risk"
-    },
-    {
-      "feature": "MaritalStatus.Single",
-      "label": "MaritalStatus: Single",
-      "coefficient": 1.053,
-      "coeff_fmt": "+1.05",
-      "direction": "risk"
-    },
-    {
-      "feature": "EducationField.Medical",
-      "label": "EducationField: Medical",
-      "coefficient": -0.8987,
-      "coeff_fmt": "−0.90",
-      "direction": "protect"
-    },
-    {
-      "feature": "BusinessTravel",
-      "label": "Business Travel Frequency",
-      "coefficient": 0.8873,
-      "coeff_fmt": "+0.89",
-      "direction": "risk"
-    },
-    {
-      "feature": "`JobRole.Research Scientist`",
-      "label": "JobRole: Research Scientist",
-      "coefficient": 0.8738,
-      "coeff_fmt": "+0.87",
+      "coefficient": 0.4908,
+      "coeff_fmt": "+0.49",
       "direction": "risk"
     }
   ],
@@ -105,11 +105,11 @@
     {
       "name": "Logistic Regression",
       "threshold": 0.25,
-      "acc": 0.851,
-      "prec": 0.608,
-      "recall": 0.705,
-      "f1": 0.653,
-      "auc": 0.859,
+      "acc": 0.859,
+      "prec": 0.558,
+      "recall": 0.667,
+      "f1": 0.608,
+      "auc": 0.776,
       "selected": true
     },
     {
@@ -119,132 +119,49 @@
       "prec": 0.675,
       "recall": 0.614,
       "f1": 0.643,
-      "auc": 0.85,
+      "auc": 0.857,
       "selected": false
     },
     {
       "name": "glmnet Ridge",
-      "threshold": 0.5,
-      "acc": 0.887,
-      "prec": 0.88,
-      "recall": 0.5,
-      "f1": 0.638,
-      "auc": 0.855,
-      "selected": false
-    },
-    {
-      "name": "XGBoost",
-      "threshold": 0.39,
-      "acc": 0.81,
-      "prec": 0.516,
-      "recall": 0.727,
-      "f1": 0.604,
-      "auc": 0.829,
-      "selected": false
-    },
-    {
-      "name": "Random Forest",
       "threshold": 0.24,
-      "acc": 0.837,
-      "prec": 0.618,
-      "recall": 0.477,
-      "f1": 0.538,
-      "auc": 0.757,
+      "acc": 0.85,
+      "prec": 0.592,
+      "recall": 0.682,
+      "f1": 0.634,
+      "auc": 0.851,
       "selected": false
     },
     {
       "name": "Decision Tree",
-      "threshold": 0.11,
-      "acc": 0.796,
-      "prec": 0.489,
-      "recall": 0.523,
-      "f1": 0.505,
-      "auc": 0.705,
+      "threshold": 0.5,
+      "acc": 0.823,
+      "prec": 0.484,
+      "recall": 0.614,
+      "f1": 0.541,
+      "auc": 0.749,
+      "selected": false
+    },
+    {
+      "name": "Random Forest",
+      "threshold": 0.27,
+      "acc": 0.857,
+      "prec": 0.629,
+      "recall": 0.614,
+      "f1": 0.621,
+      "auc": 0.868,
+      "selected": false
+    },
+    {
+      "name": "XGBoost",
+      "threshold": 0.23,
+      "acc": 0.85,
+      "prec": 0.605,
+      "recall": 0.659,
+      "f1": 0.631,
+      "auc": 0.86,
       "selected": false
     }
   ],
-  "hr_recommendations": [
-    {
-      "driver": "Mandatory Overtime",
-      "predictor": "OverTime = Yes",
-      "coefficient": "+2.41",
-      "priority": "critical",
-      "recommendation": "Implement an overtime audit. Limit mandatory overtime to no more than 5 hours/week. Introduce compensatory time off and flexible scheduling to reduce burnout. Consider hiring additional staff in high-overtime roles.",
-      "impact": "OverTime is the single strongest predictor of attrition — addressing it directly reduces the highest-risk employee segment."
-    },
-    {
-      "driver": "Sales Representative Role",
-      "predictor": "JobRole: Sales Representative",
-      "coefficient": "+1.89",
-      "priority": "critical",
-      "recommendation": "Review commission structures, career progression paths, and workload for Sales Representatives. Introduce a dedicated mentoring programme and clear 6/12/18-month career roadmap. Consider realistic quota-setting reviews quarterly.",
-      "impact": "Sales Reps carry the highest role-specific attrition risk in the organisation."
-    },
-    {
-      "driver": "Single Employees",
-      "predictor": "MaritalStatus: Single",
-      "coefficient": "+1.12",
-      "priority": "high",
-      "recommendation": "Create social engagement opportunities (team events, mentorship circles) that help single employees build workplace bonds. Offer flexible work-from-home options that suit varied lifestyles.",
-      "impact": "Single employees leave more frequently — improving workplace community reduces their departure rate."
-    },
-    {
-      "driver": "Frequent Business Travel",
-      "predictor": "BusinessTravel: Frequently",
-      "coefficient": "+0.98",
-      "priority": "high",
-      "recommendation": "Introduce travel caps (e.g. max 8 trips/year). Where possible, replace in-person trips with video conferencing. Provide premium travel support (lounge access, flexible return dates) for unavoidable travel.",
-      "impact": "Frequent travel correlates with burnout; reducing it lowers attrition in affected roles."
-    },
-    {
-      "driver": "Insufficient Tenure Rewards",
-      "predictor": "Years at Company (negative coeff.)",
-      "coefficient": "−0.87",
-      "priority": "medium",
-      "recommendation": "Introduce milestone-based loyalty bonuses at 2, 5, and 10 years. Recognise tenure publicly (awards, profiles). Early-career employees (0–2 years) are the highest flight-risk — assign onboarding buddies and check-in meetings.",
-      "impact": "Tenure is a strong protective factor — investing in the first 2 years significantly reduces attrition."
-    },
-    {
-      "driver": "Compensation Below Market",
-      "predictor": "Monthly Income (negative coeff.)",
-      "coefficient": "−0.54",
-      "priority": "high",
-      "recommendation": "Benchmark salaries against market at least annually. Introduce merit-based pay reviews every 6 months. For roles with high model-predicted risk (Sales Reps, overtime-heavy roles), prioritise pay adjustments first.",
-      "impact": "Higher income is a strong retention driver — even moderate increases reduce attrition risk."
-    },
-    {
-      "driver": "Low Job Satisfaction",
-      "predictor": "Job Satisfaction (negative coeff.)",
-      "coefficient": "−0.48",
-      "priority": "medium",
-      "recommendation": "Deploy bi-annual employee pulse surveys. Require managers to create action plans for teams scoring below 3/5 on satisfaction. Invest in manager training — direct manager relationship is often the primary satisfaction driver.",
-      "impact": "High satisfaction scores reduce attrition probability by approximately 30%."
-    }
-  ],
-  "ethical_implications": [
-    {
-      "aspect": "Fairness & Protected Attributes",
-      "detail": "The model does not use race, religion, or nationality. However, MaritalStatus and Gender were included as features. Gender showed low predictive weight and was retained; however HR must ensure predictions are not used to discriminate on the basis of marital status, which may correlate with protected characteristics. Recommendations based on MaritalStatus should be about support programs, never punitive action."
-    },
-    {
-      "aspect": "Transparency & Explainability",
-      "detail": "Logistic Regression was deliberately chosen over higher-accuracy black-box models (XGBoost, RF) to ensure full coefficient explainability. Every prediction comes with a probability and risk level. HR managers can trace exactly which factors drove a high-risk score for any employee."
-    },
-    {
-      "aspect": "Privacy & Data Governance",
-      "detail": "Prediction data is stored in Firebase Firestore. Access must be restricted to authorised HR personnel only — implement Firebase Security Rules with role-based access. Employee prediction data should be treated as sensitive HR data and governed by applicable data protection regulations (GDPR, POPIA, etc.)."
-    },
-    {
-      "aspect": "Risk of Algorithmic Bias",
-      "detail": "Predictions are based on historical patterns in a single company's data. If the organisation has historically shown bias in attrition (e.g. certain departments having systematically higher turnover due to management culture), the model will learn and amplify those patterns. Periodic fairness audits (checking prediction rates across demographic groups) are strongly recommended."
-    },
-    {
-      "aspect": "Human Oversight Requirement",
-      "detail": "This system is a decision-support tool only. Attrition predictions must never be used as the sole basis for employment decisions, performance reviews, or disciplinary action. All model outputs must be reviewed by a qualified HR professional before any action is taken. Final employment decisions must remain with humans."
-    },
-    {
-      "aspect": "Model Drift & Retraining",
-      "detail": "The model was trained on data from a specific time period. Organisational changes (restructuring, new policies, economic shifts) will reduce model accuracy over time. Schedule quarterly performance reviews comparing model predictions to actual attrition. Retrain at least annually or when F1 drops below 0.50 on recent data."
-    }
-  ]
+  "removed_for_multicollinearity": ["SatisfactionIndex", "JobSatisfaction", "EnvironmentSatisfaction", "RelationshipSatisfaction", "Department.Research & Development", "Department.Sales", "Department.Human Resources", "JobRole.Human Resources", "JobRole.Sales Executive", "JobRole.Sales Representative", "JobRole.Laboratory Technician", "JobRole.Research Scientist", "JobLevel", "YearsAtCompany"]
 }

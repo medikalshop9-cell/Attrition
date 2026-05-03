@@ -1,28 +1,12 @@
 # =============================================================================
 # Phase 7: Plumber REST API
-# Model: Logistic Regression (threshold = 0.25)
+# Model: Logistic Regression (threshold = 0.26)
 # Endpoints: GET /health, POST /predict
 # =============================================================================
 
 library(plumber)
 library(dplyr)
 library(caret)
-
-# =============================================================================
-# CORS filter — allows React dev server (localhost:5173) to call the API
-# =============================================================================
-
-#* @filter cors
-function(req, res) {
-  res$setHeader("Access-Control-Allow-Origin",  "*")
-  res$setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-  res$setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization")
-  if (req$REQUEST_METHOD == "OPTIONS") {
-    res$status <- 200L
-    return(list())
-  }
-  plumber::forward()
-}
 
 # =============================================================================
 # Load model and scaling params once at startup
@@ -118,6 +102,19 @@ preprocess_input <- function(emp) {
   emp
 }
 
+# Columns removed during Phase 7+8 multicollinearity rebuild
+DROPPED_COLS <- c(
+  "SatisfactionIndex", "JobSatisfaction",
+  "EnvironmentSatisfaction", "RelationshipSatisfaction",
+  "Department.Research & Development", "Department.Sales",
+  "Department.Human Resources",
+  "JobRole.Human Resources", "JobRole.Sales Executive",
+  "JobRole.Sales Representative", "JobRole.Laboratory Technician",
+  "JobRole.Research Scientist",
+  "JobLevel",
+  "TotalWorkingYears"   # Phase 8: redundant with YearsAtCompany; dropping improves AUC +0.004
+)
+
 # Validate all expected model features are present
 EXPECTED_FEATURES <- setdiff(names(final_model$model), "Attrition")
 
@@ -196,6 +193,12 @@ function(req) {
     return(list(error = emp_processed$.__error__))
   }
 
+  # Drop multicollinear columns (Phase 7 rebuild)
+  cols_to_drop <- intersect(DROPPED_COLS, names(emp_processed))
+  if (length(cols_to_drop) > 0) {
+    emp_processed <- emp_processed %>% select(-all_of(cols_to_drop))
+  }
+
   # Predict
   prob <- tryCatch(
     as.numeric(predict(final_model, newdata = emp_processed, type = "response")),
@@ -230,4 +233,122 @@ function() {
     return(list(error = "insights_report.json not found — run 08_reporting.R first"))
   }
   jsonlite::fromJSON(report_path, simplifyVector = FALSE)
+}
+
+# =============================================================================
+# ── GET /feature_importance ───────────────────────────────────────────────────
+#* @get /feature_importance
+#* @serializer unboxedJSON
+function() {
+  fi_path <- file.path(BASE_DIR, "feature_importance.json")
+  if (!file.exists(fi_path)) {
+    return(list(error = "feature_importance.json not found — run 12_feature_importance.R"))
+  }
+  jsonlite::fromJSON(fi_path, simplifyVector = FALSE)
+}
+
+# =============================================================================
+# ── GET /shap_metadata ────────────────────────────────────────────────────────
+#* @get /shap_metadata
+#* @serializer unboxedJSON
+function() {
+  shap_path <- file.path(BASE_DIR, "shap_metadata.json")
+  if (!file.exists(shap_path)) {
+    return(list(error = "shap_metadata.json not found — run 12b_export_shap_metadata.R"))
+  }
+  jsonlite::fromJSON(shap_path, simplifyVector = FALSE)
+}
+
+# =============================================================================
+# ── POST /shap ────────────────────────────────────────────────────────────────
+# Returns per-feature LinearSHAP values for a single employee.
+# Uses the same preprocessing as POST /predict, then computes
+# shap_i = beta_i * (x_i - mean_i) / denom_i (consistent with the
+# frontend computeShap() function).
+#* @post /shap
+#* @serializer unboxedJSON
+#* @param req The HTTP request body (JSON employee record)
+function(req) {
+
+  shap_path <- file.path(BASE_DIR, "shap_metadata.json")
+  if (!file.exists(shap_path)) {
+    return(list(error = "shap_metadata.json not found"))
+  }
+  shap_meta <- jsonlite::fromJSON(shap_path)
+
+  body <- tryCatch(jsonlite::fromJSON(req$postBody), error = function(e) NULL)
+  if (is.null(body)) return(list(error = "Invalid JSON in request body"))
+
+  required <- c(
+    "Age", "BusinessTravel", "DailyRate", "Department",
+    "DistanceFromHome", "Education", "EducationField",
+    "EnvironmentSatisfaction", "Gender", "HourlyRate",
+    "JobInvolvement", "JobLevel", "JobRole", "JobSatisfaction",
+    "MaritalStatus", "MonthlyIncome", "MonthlyRate",
+    "NumCompaniesWorked", "OverTime", "PercentSalaryHike",
+    "PerformanceRating", "RelationshipSatisfaction",
+    "StockOptionLevel", "TotalWorkingYears",
+    "TrainingTimesLastYear", "WorkLifeBalance",
+    "YearsAtCompany", "YearsInCurrentRole",
+    "YearsSinceLastPromotion", "YearsWithCurrManager"
+  )
+
+  missing_fields <- setdiff(required, names(body))
+  if (length(missing_fields) > 0) {
+    return(list(
+      error          = "Missing required fields",
+      missing_fields = paste(missing_fields, collapse = ", ")
+    ))
+  }
+
+  emp <- tryCatch(as.data.frame(body, stringsAsFactors = FALSE), error = function(e) NULL)
+  if (is.null(emp)) return(list(error = "Could not parse employee fields"))
+
+  emp_p <- tryCatch(
+    preprocess_input(emp),
+    error = function(e) list(.__error__ = conditionMessage(e))
+  )
+  if (!is.null(emp_p$.__error__)) return(list(error = emp_p$.__error__))
+
+  cols_to_drop <- intersect(DROPPED_COLS, names(emp_p))
+  if (length(cols_to_drop) > 0) emp_p <- emp_p %>% select(-all_of(cols_to_drop))
+
+  prob <- tryCatch(
+    as.numeric(predict(final_model, newdata = emp_p, type = "response")),
+    error = function(e) NULL
+  )
+  if (is.null(prob)) return(list(error = "Prediction failed"))
+
+  # Compute LinearSHAP using feature specs from shap_metadata.json
+  # Formula: shap_i = beta_i * (x_i - mean_i) / denom_i
+  #          where denom = 2*sd for binary features, sd otherwise
+  feat_df <- shap_meta$features  # data.frame: name, beta, mean, sd, is_binary, direction
+
+  shap_vals <- lapply(seq_len(nrow(feat_df)), function(i) {
+    feat     <- feat_df[i, ]
+    x        <- if (feat$name %in% names(emp_p)) as.numeric(emp_p[[feat$name]]) else 0
+    denom    <- if (isTRUE(feat$is_binary)) 2 * feat$sd else feat$sd
+    x_scaled <- if (denom > 0) (x - feat$mean) / denom else 0
+    list(
+      feature   = feat$name,
+      impact    = round(feat$beta * x_scaled, 6),
+      raw_value = round(x, 4),
+      direction = feat$direction
+    )
+  })
+
+  # Sort by |impact| descending
+  shap_vals <- shap_vals[order(sapply(shap_vals, function(v) abs(v$impact)), decreasing = TRUE)]
+
+  list(
+    risk_score    = round(prob, 4),
+    risk_label    = dplyr::case_when(
+      prob >= 0.70 ~ "High",
+      prob >= 0.40 ~ "Medium",
+      TRUE         ~ "Low"
+    ),
+    baseline_prob = shap_meta$baseline_prob,
+    intercept     = shap_meta$intercept,
+    shap_values   = shap_vals
+  )
 }

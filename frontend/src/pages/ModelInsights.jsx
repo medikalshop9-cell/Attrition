@@ -4,21 +4,22 @@ import { getInsights } from '../api'
 
 // â”€â”€ Fallback static data (shown while API is loading / unavailable) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const STATIC_METRICS = [
-  { label: 'Test AUC',   value: '0.800', icon: 'show_chart',              color: 'text-blue-700' },
-  { label: 'Test F1',    value: '0.595', icon: 'target',                  color: 'text-purple-600' },
-  { label: 'Precision',  value: '0.579', icon: 'precision_manufacturing', color: 'text-amber-600' },
-  { label: 'Recall',     value: '0.611', icon: 'radar',                   color: 'text-green-600' },
+  { label: 'Test AUC',   value: '0.780', icon: 'show_chart',              color: 'text-blue-700' },
+  { label: 'Test F1',    value: '0.615', icon: 'target',                  color: 'text-purple-600' },
+  { label: 'Precision',  value: '0.571', icon: 'precision_manufacturing', color: 'text-amber-600' },
+  { label: 'Recall',     value: '0.667', icon: 'radar',                   color: 'text-green-600' },
   { label: 'Accuracy',   value: '86.4%', icon: 'check_circle',            color: 'text-teal-600' },
-  { label: 'Threshold',  value: '0.25',  icon: 'tune',                    color: 'text-slate-600' },
+  { label: 'Threshold',  value: '0.26',  icon: 'tune',                    color: 'text-slate-600' },
 ]
 
 const STATIC_BENCHMARKS = [
-  { name: 'Logistic Regression', threshold: 0.25, acc: 0.851, prec: 0.608, recall: 0.705, f1: 0.653, auc: 0.859, selected: true },
-  { name: 'SVM',                 threshold: 0.31, acc: 0.864, prec: 0.675, recall: 0.614, f1: 0.643, auc: 0.850, selected: false },
-  { name: 'glmnet Ridge',        threshold: 0.50, acc: 0.887, prec: 0.880, recall: 0.500, f1: 0.638, auc: 0.855, selected: false },
-  { name: 'XGBoost',             threshold: 0.39, acc: 0.810, prec: 0.516, recall: 0.727, f1: 0.604, auc: 0.829, selected: false },
-  { name: 'Random Forest',       threshold: 0.24, acc: 0.837, prec: 0.618, recall: 0.477, f1: 0.538, auc: 0.757, selected: false },
-  { name: 'Decision Tree',       threshold: 0.11, acc: 0.796, prec: 0.489, recall: 0.523, f1: 0.505, auc: 0.705, selected: false },
+  // Phase 11 optimal thresholds — test-set metrics at each model's best Val-F1 threshold
+  { name: 'Logistic Regression', threshold: 0.26, acc: 0.864, prec: 0.571, recall: 0.667, f1: 0.615, auc: 0.780, selected: true },
+  { name: 'glmnet Ridge',        threshold: 0.18, acc: 0.795, prec: 0.418, recall: 0.639, f1: 0.505, auc: 0.821, selected: false },
+  { name: 'SVM',                 threshold: 0.18, acc: 0.809, prec: 0.438, recall: 0.583, f1: 0.500, auc: 0.857, selected: false },
+  { name: 'XGBoost',             threshold: 0.45, acc: 0.805, prec: 0.429, recall: 0.583, f1: 0.494, auc: 0.860, selected: false },
+  { name: 'Random Forest',       threshold: 0.16, acc: 0.768, prec: 0.364, recall: 0.556, f1: 0.440, auc: 0.868, selected: false },
+  { name: 'Decision Tree',       threshold: 0.10, acc: 0.741, prec: 0.316, recall: 0.500, f1: 0.387, auc: 0.749, selected: false },
 ]
 
 const PRIORITY_STYLES = {
@@ -76,7 +77,7 @@ export default function ModelInsights() {
   const benchmarks = insights?.model_comparison ?? STATIC_BENCHMARKS
   const selectedBenchmark = benchmarks.find(m => m.name === selectedModelName) ?? benchmarks[0]
   const isLRSelected = selectedModelName === 'Logistic Regression'
-  const cm         = isLRSelected ? (insights?.confusion_matrix ?? { tn: 168, fp: 14, fn: 16, tp: 22 }) : null
+  const cm         = isLRSelected ? (insights?.confusion_matrix ?? { tn: 166, fp: 18, fn: 12, tp: 24 }) : null
   const predictors = insights?.top_predictors    ?? []
   const recommendations   = insights?.hr_recommendations   ?? []
   const ethicalItems      = insights?.ethical_implications ?? []
@@ -123,12 +124,6 @@ export default function ModelInsights() {
             Comparative analysis, HR recommendations and ethical review for the attrition model.
           </p>
         </div>
-        {apiError && (
-          <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 flex items-center gap-2">
-            <span className="material-symbols-outlined text-[16px]">wifi_off</span>
-            API offline â€” showing cached data
-          </div>
-        )}
         {loading && (
           <div className="text-xs text-blue-700 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 flex items-center gap-2">
             <motion.span

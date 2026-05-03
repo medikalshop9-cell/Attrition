@@ -12,14 +12,17 @@ const DEFAULT_FORM = {
   Age: 34,
   BusinessTravel: 'Travel_Rarely',
   DailyRate: 802,
+  // Department is dropped by the model but still required by the API for preprocessing
   Department: 'Research & Development',
   DistanceFromHome: 9,
   Education: 3,
   EducationField: 'Life Sciences',
+  // Satisfaction fields are dropped (collinear) but API needs them to build SatisfactionIndex
   EnvironmentSatisfaction: 3,
   Gender: 'Male',
   HourlyRate: 66,
   JobInvolvement: 3,
+  // JobLevel is dropped (collinear) but API still requires it
   JobLevel: 2,
   JobRole: 'Research Scientist',
   JobSatisfaction: 3,
@@ -45,16 +48,13 @@ function computeRiskFactors(form) {
   const items = []
   if (form.OverTime === 'Yes')                   items.push({ icon: 'schedule',             color: 'bg-red-100 text-red-600',        label: 'OverTime Active',           desc: 'Working extra hours significantly raises burnout and departure risk.' })
   if (form.BusinessTravel === 'Travel_Frequently') items.push({ icon: 'flight_takeoff',        color: 'bg-amber-100 text-amber-600',    label: 'Frequent Business Travel',  desc: 'Frequent travel correlates with 12% higher attrition rate.' })
-  if (form.JobSatisfaction <= 2)                 items.push({ icon: 'sentiment_dissatisfied', color: 'bg-red-100 text-red-600',        label: 'Low Job Satisfaction',      desc: 'Low satisfaction is a leading indicator of voluntary departure.' })
   if (form.WorkLifeBalance <= 2)                 items.push({ icon: 'balance',                color: 'bg-red-100 text-red-600',        label: 'Poor Work-Life Balance',    desc: 'Low work-life balance is correlated with burnout and attrition.' })
-  if (form.EnvironmentSatisfaction <= 2)         items.push({ icon: 'place',                  color: 'bg-orange-100 text-orange-600',  label: 'Low Environment Satisfaction', desc: 'Dissatisfaction with work environment raises flight risk.' })
   if (form.YearsSinceLastPromotion >= 3)         items.push({ icon: 'trending_up',            color: 'bg-amber-100 text-amber-600',    label: 'No Recent Promotion',       desc: `${form.YearsSinceLastPromotion} years without promotion increases flight risk.` })
   if (form.NumCompaniesWorked >= 5)              items.push({ icon: 'work_history',           color: 'bg-blue-100 text-blue-700',      label: 'High Job Mobility',         desc: `Worked at ${form.NumCompaniesWorked} companies — indicates mobility tendency.` })
   if (form.MaritalStatus === 'Single')           items.push({ icon: 'person',                 color: 'bg-purple-100 text-purple-700',  label: 'Single Marital Status',     desc: 'Single employees historically show higher attrition rates.' })
   if (form.MonthlyIncome < 3500)                 items.push({ icon: 'payments',               color: 'bg-blue-100 text-blue-700',      label: 'Below-median Income',       desc: `Monthly income ($${form.MonthlyIncome.toLocaleString()}) is below the company median.` })
   // Positive retention factors
   if (form.YearsAtCompany >= 8)                  items.push({ icon: 'check_circle',           color: 'bg-green-100 text-green-700',    label: 'Long Company Tenure',       desc: `${form.YearsAtCompany} years at company — strong retention indicator.` })
-  if (form.JobSatisfaction >= 4)                 items.push({ icon: 'sentiment_very_satisfied', color: 'bg-green-100 text-green-700', label: 'High Job Satisfaction',     desc: 'High satisfaction reduces attrition risk by ~30%.' })
   if (form.MonthlyIncome >= 8000)                items.push({ icon: 'savings',                color: 'bg-green-100 text-green-700',    label: 'High Compensation',         desc: 'Above-average income is a strong retention factor.' })
   // Ensure at least one factor
   if (items.length === 0) items.push({ icon: 'info', color: 'bg-slate-100 text-slate-600', label: 'Profile within normal range', desc: 'No strong individual risk factors detected for this profile.' })
@@ -124,7 +124,7 @@ function NumberField({ label, name, value, onChange, prefix }) {
 export default function PredictionTool() {
   const [form, setForm] = useState(DEFAULT_FORM)
   const [employeeName, setEmployeeName] = useState('')
-  const [threshold, setThreshold] = useState(0.25)
+  const [threshold, setThreshold] = useState(0.26)
   const [rawResult, setRawResult] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -166,8 +166,10 @@ export default function PredictionTool() {
           timestamp: serverTimestamp(),
         })
         toast({ type: 'success', title: 'Saved to Risk Watch', message: `${res.risk_level} risk prediction stored in Firestore.` })
-      } catch {
-        toast({ type: 'info', title: 'Prediction complete', message: 'Firebase not configured — result not saved.' })
+      } catch (fbErr) {
+        // Firebase write failed — prediction result is still shown above
+        // Silently log; don't interrupt the user with a misleading toast
+        console.warn('Firestore save failed:', fbErr?.code ?? fbErr?.message)
       }
     } catch (err) {
       const isTimeout = err.code === 'ECONNABORTED' || err.message?.includes('timeout')
@@ -289,13 +291,6 @@ export default function PredictionTool() {
               {/* Right col — Professional */}
               <div className="space-y-4">
                 <SelectField
-                  label="Department"
-                  name="Department"
-                  value={form.Department}
-                  onChange={handleChange}
-                  options={['Research & Development', 'Sales', 'Human Resources']}
-                />
-                <SelectField
                   label="Job Role"
                   name="JobRole"
                   value={form.JobRole}
@@ -329,33 +324,17 @@ export default function PredictionTool() {
                   </div>
                 </div>
                 <label className="block">
-                  <span className="text-label-md font-label-md text-secondary mb-1 block uppercase">Job Level</span>
-                  <SegmentedButtons value={form.JobLevel} onChange={(v) => handleSegmented('JobLevel', v)} options={[1, 2, 3, 4, 5]} />
-                </label>
-                <label className="block">
                   <span className="text-label-md font-label-md text-secondary mb-1 block uppercase">Stock Option Level</span>
                   <SegmentedButtons value={form.StockOptionLevel} onChange={(v) => handleSegmented('StockOptionLevel', v)} options={[0, 1, 2, 3]} />
                 </label>
               </div>
             </div>
 
-            {/* Row 2: Satisfaction & Experience */}
+            {/* Row 2: Experience & Engagement */}
             <div>
-              <h4 className="text-label-md uppercase text-secondary mb-4 border-t border-slate-100 pt-4">Satisfaction & Experience</h4>
+              <h4 className="text-label-md uppercase text-secondary mb-4 border-t border-slate-100 pt-4">Engagement & Tenure</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
-                  <label className="block">
-                    <span className="text-label-md font-label-md text-secondary mb-1 block uppercase">Environment Satisfaction (1–4)</span>
-                    <SegmentedButtons value={form.EnvironmentSatisfaction} onChange={(v) => handleSegmented('EnvironmentSatisfaction', v)} options={[1, 2, 3, 4]} />
-                  </label>
-                  <label className="block">
-                    <span className="text-label-md font-label-md text-secondary mb-1 block uppercase">Job Satisfaction (1–4)</span>
-                    <SegmentedButtons value={form.JobSatisfaction} onChange={(v) => handleSegmented('JobSatisfaction', v)} options={[1, 2, 3, 4]} />
-                  </label>
-                  <label className="block">
-                    <span className="text-label-md font-label-md text-secondary mb-1 block uppercase">Relationship Satisfaction (1–4)</span>
-                    <SegmentedButtons value={form.RelationshipSatisfaction} onChange={(v) => handleSegmented('RelationshipSatisfaction', v)} options={[1, 2, 3, 4]} />
-                  </label>
                   <label className="block">
                     <span className="text-label-md font-label-md text-secondary mb-1 block uppercase">Work-Life Balance (1–4)</span>
                     <SegmentedButtons value={form.WorkLifeBalance} onChange={(v) => handleSegmented('WorkLifeBalance', v)} options={[1, 2, 3, 4]} />
@@ -364,11 +343,10 @@ export default function PredictionTool() {
                     <span className="text-label-md font-label-md text-secondary mb-1 block uppercase">Job Involvement (1–4)</span>
                     <SegmentedButtons value={form.JobInvolvement} onChange={(v) => handleSegmented('JobInvolvement', v)} options={[1, 2, 3, 4]} />
                   </label>
-                </div>
-                <div className="space-y-4">
-                  <NumberField label="Total Working Years" name="TotalWorkingYears" value={form.TotalWorkingYears} onChange={handleChange} />
                   <NumberField label="Years at Company" name="YearsAtCompany" value={form.YearsAtCompany} onChange={handleChange} />
                   <NumberField label="Years in Current Role" name="YearsInCurrentRole" value={form.YearsInCurrentRole} onChange={handleChange} />
+                </div>
+                <div className="space-y-4">
                   <NumberField label="Years Since Last Promotion" name="YearsSinceLastPromotion" value={form.YearsSinceLastPromotion} onChange={handleChange} />
                   <NumberField label="Years with Current Manager" name="YearsWithCurrManager" value={form.YearsWithCurrManager} onChange={handleChange} />
                 </div>
@@ -483,9 +461,10 @@ export default function PredictionTool() {
             </div>
             <dl className="space-y-2 text-body-md mb-5">
               <div className="flex justify-between"><dt className="text-secondary">Algorithm</dt><dd className="font-semibold">Logistic Regression</dd></div>
-              <div className="flex justify-between"><dt className="text-secondary">Test AUC</dt><dd className="font-semibold text-blue-700">0.800</dd></div>
-              <div className="flex justify-between"><dt className="text-secondary">Test F1</dt><dd className="font-semibold text-blue-700">0.595</dd></div>
-              <div className="flex justify-between"><dt className="text-secondary">Recall</dt><dd className="font-semibold">0.611</dd></div>
+              <div className="flex justify-between"><dt className="text-secondary">Test AUC</dt><dd className="font-semibold text-blue-700">0.780</dd></div>
+              <div className="flex justify-between"><dt className="text-secondary">Test F1</dt><dd className="font-semibold text-blue-700">0.615</dd></div>
+              <div className="flex justify-between"><dt className="text-secondary">Recall</dt><dd className="font-semibold">0.667</dd></div>
+              <div className="flex justify-between"><dt className="text-secondary">Threshold</dt><dd className="font-semibold">0.26</dd></div>
             </dl>
             {/* Threshold slider */}
             <div className="border-t border-slate-100 pt-4">
