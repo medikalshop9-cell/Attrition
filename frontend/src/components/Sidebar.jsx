@@ -1,9 +1,10 @@
 import { NavLink } from 'react-router-dom'
 
 const navItems = [
-  { to: '/predict', icon: 'analytics', label: 'Attrition Risk' },
-  { to: '/risk-watch', icon: 'group', label: 'Employee Risk Watch' },
-  { to: '/insights', icon: 'query_stats', label: 'Model Insights' },
+  { to: '/predict',   icon: 'analytics',   label: 'Attrition Risk' },
+  { to: '/risk-watch',icon: 'group',        label: 'Employee Risk Watch' },
+  { to: '/insights',  icon: 'query_stats',  label: 'Model Insights' },
+  { to: '/shap',      icon: 'psychology',   label: 'Model Interpretability' },
 ]
 
 export default function Sidebar() {
@@ -17,39 +18,20 @@ export default function Sidebar() {
 
       {/* Nav items */}
       <div className="flex-1 space-y-1">
-        <NavLink
-          to="/predict"
-          className={({ isActive }) =>
-            isActive
-              ? 'bg-white dark:bg-slate-800 text-blue-700 dark:text-blue-300 font-bold border-r-4 border-blue-700 dark:border-blue-400 px-4 py-3 flex items-center gap-3 transition-all duration-200'
-              : 'text-slate-600 dark:text-slate-400 px-4 py-3 flex items-center gap-3 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-200'
-          }
-        >
-          <span className="material-symbols-outlined text-[20px]">analytics</span>
-          Attrition Risk
-        </NavLink>
-        <NavLink
-          to="/risk-watch"
-          className={({ isActive }) =>
-            isActive
-              ? 'bg-white dark:bg-slate-800 text-blue-700 dark:text-blue-300 font-bold border-r-4 border-blue-700 dark:border-blue-400 px-4 py-3 flex items-center gap-3 transition-all duration-200'
-              : 'text-slate-600 dark:text-slate-400 px-4 py-3 flex items-center gap-3 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-200'
-          }
-        >
-          <span className="material-symbols-outlined text-[20px]">group</span>
-          Employee Risk Watch
-        </NavLink>
-        <NavLink
-          to="/insights"
-          className={({ isActive }) =>
-            isActive
-              ? 'bg-white dark:bg-slate-800 text-blue-700 dark:text-blue-300 font-bold border-r-4 border-blue-700 dark:border-blue-400 px-4 py-3 flex items-center gap-3 transition-all duration-200'
-              : 'text-slate-600 dark:text-slate-400 px-4 py-3 flex items-center gap-3 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-200'
-          }
-        >
-          <span className="material-symbols-outlined text-[20px]">query_stats</span>
-          Model Insights
-        </NavLink>
+        {navItems.map(({ to, icon, label }) => (
+          <NavLink
+            key={to}
+            to={to}
+            className={({ isActive }) =>
+              isActive
+                ? 'bg-white dark:bg-slate-800 text-blue-700 dark:text-blue-300 font-bold border-r-4 border-blue-700 dark:border-blue-400 px-4 py-3 flex items-center gap-3 transition-all duration-200'
+                : 'text-slate-600 dark:text-slate-400 px-4 py-3 flex items-center gap-3 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-200'
+            }
+          >
+            <span className="material-symbols-outlined text-[20px]">{icon}</span>
+            {label}
+          </NavLink>
+        ))}
       </div>
 
       {/* Footer */}

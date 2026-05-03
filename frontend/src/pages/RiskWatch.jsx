@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { db } from '../firebase'
 import { collection, query, orderBy, onSnapshot, limit } from 'firebase/firestore'
@@ -63,6 +63,8 @@ export default function RiskWatch() {
   const [loading, setLoading] = useState(true)
   const [firebaseError, setFirebaseError] = useState(false)
   const [filter, setFilter] = useState('All')
+  const [search, setSearch] = useState('')
+  const searchRef = useRef(null)
 
   useEffect(() => {
     const q = query(collection(db, 'predictions'), orderBy('timestamp', 'desc'), limit(100))
@@ -82,7 +84,17 @@ export default function RiskWatch() {
     return unsub
   }, [])
 
-  const filtered = filter === 'All' ? records : records.filter((r) => r.risk_level === filter)
+  const byRisk = filter === 'All' ? records : records.filter((r) => r.risk_level === filter)
+  const filtered = search.trim()
+    ? byRisk.filter((r) => {
+        const q = search.trim().toLowerCase()
+        return (
+          (r.employeeName ?? '').toLowerCase().includes(q) ||
+          (r.JobRole ?? '').toLowerCase().includes(q) ||
+          (r.Department ?? '').toLowerCase().includes(q)
+        )
+      })
+    : byRisk
 
   const high = records.filter((r) => r.risk_level === 'High').length
   const medium = records.filter((r) => r.risk_level === 'Medium').length
@@ -131,8 +143,33 @@ export default function RiskWatch() {
         </div>
       )}
 
-      {/* Filter tabs */}
-      <div className="flex gap-2 mb-6">
+      {/* Search + Filter row */}
+      <div className="flex flex-col sm:flex-row gap-3 mb-6">
+        {/* Search input */}
+        <div className="relative flex-1 max-w-xs">
+          <span className="material-symbols-outlined pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">search</span>
+          <input
+            ref={searchRef}
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search employees…"
+            className="w-full pl-9 pr-9 py-2.5 border border-slate-200 rounded-lg text-body-md bg-white focus:ring-2 focus:ring-primary focus:border-primary outline-none placeholder:text-slate-400"
+          />
+          {search && (
+            <button
+              type="button"
+              onClick={() => { setSearch(''); searchRef.current?.focus() }}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+              aria-label="Clear search"
+            >
+              <span className="material-symbols-outlined text-[16px]">close</span>
+            </button>
+          )}
+        </div>
+
+        {/* Filter tabs */}
+        <div className="flex gap-2">
         {['All', 'High', 'Medium', 'Low'].map((level) => (
           <motion.button
             key={level}
@@ -150,13 +187,17 @@ export default function RiskWatch() {
             )}
           </motion.button>
         ))}
+        </div>
       </div>
 
       {/* Table */}
       <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
         <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
           <h3 className="text-headline-md font-semibold text-primary">Prediction History</h3>
-          <span className="text-label-md text-secondary">{filtered.length} record{filtered.length !== 1 ? 's' : ''}</span>
+          <span className="text-label-md text-secondary">
+            {filtered.length} record{filtered.length !== 1 ? 's' : ''}
+            {search.trim() ? ` matching "${search.trim()}"` : ''}
+          </span>
         </div>
 
         {loading ? (
@@ -167,9 +208,13 @@ export default function RiskWatch() {
         ) : filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-slate-400">
             <span className="material-symbols-outlined text-[56px] mb-4">manage_search</span>
-            <p className="text-headline-md font-semibold text-on-surface mb-2">No records yet</p>
+            <p className="text-headline-md font-semibold text-on-surface mb-2">
+              {search ? 'No matching records' : 'No records yet'}
+            </p>
             <p className="text-body-md text-center max-w-sm">
-              Run a prediction using the Attrition Risk tool. Each result is saved here automatically.
+              {search
+                ? `No results for "${search}". Try a different name, role, or department.`
+                : 'Run a prediction using the Attrition Risk tool. Each result is saved here automatically.'}
             </p>
             <button
               onClick={() => navigate('/predict')}
