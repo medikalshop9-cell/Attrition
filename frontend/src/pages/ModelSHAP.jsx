@@ -33,9 +33,9 @@ const FEATURE_LABELS = {
 const label = (f) => FEATURE_LABELS[f] ?? f
 
 const RISK_COLORS = {
-  High:   { badge: 'bg-red-100 text-red-700 border-red-200',    dot: 'bg-red-500',   text: 'text-red-600' },
-  Medium: { badge: 'bg-amber-100 text-amber-700 border-amber-200', dot: 'bg-amber-400', text: 'text-amber-600' },
-  Low:    { badge: 'bg-green-100 text-green-700 border-green-200', dot: 'bg-green-500', text: 'text-green-600' },
+  High:   { badge: 'bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400 border-red-200 dark:border-red-500/30',    dot: 'bg-red-500',   text: 'text-red-600 dark:text-red-400' },
+  Medium: { badge: 'bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-500/30', dot: 'bg-amber-400', text: 'text-amber-600 dark:text-amber-400' },
+  Low:    { badge: 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400 border-green-200 dark:border-green-500/30', dot: 'bg-green-500', text: 'text-green-600 dark:text-green-400' },
 }
 
 const DEMO_EMPLOYEE = {
@@ -170,7 +170,6 @@ function GlobalImportanceChart({ features, n = 10 }) {
           </g>
         )
       })}
-      {/* X-axis label */}
       <text x={LABEL + BAR / 2} y={H - 2} textAnchor="middle" fontSize="9" fill="#94a3b8">Mean AUC Drop (permutation importance)</text>
     </svg>
   )
@@ -180,7 +179,6 @@ function BeeswarmPlot({ beeswarmData, n = 10 }) {
   const features = (beeswarmData || []).slice(0, n)
   if (!features.length) return null
 
-  // Find x-range
   const allContribs = features.flatMap((f) => f.contributions)
   const xMin = Math.min(...allContribs) * 1.15
   const xMax = Math.max(...allContribs) * 1.15
@@ -191,9 +189,7 @@ function BeeswarmPlot({ beeswarmData, n = 10 }) {
 
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ fontFamily: 'Inter, sans-serif' }}>
-      {/* Zero line */}
       <line x1={zeroX} y1={20} x2={zeroX} y2={H - 20} stroke="#e2e8f0" strokeWidth="1" />
-      {/* Feature rows */}
       {features.map((feat, i) => {
         const cy = 20 + i * ROW + ROW / 2
         return (
@@ -208,11 +204,9 @@ function BeeswarmPlot({ beeswarmData, n = 10 }) {
           </g>
         )
       })}
-      {/* Axis labels */}
       <text x={zeroX}           y={H - 4} textAnchor="middle" fontSize="9" fill="#94a3b8">0</text>
       <text x={PAD_L}           y={H - 4} textAnchor="middle" fontSize="9" fill="#3b82f6">Low impact</text>
       <text x={W - PAD_R - 12}  y={H - 4} textAnchor="end"    fontSize="9" fill="#ef4444">High impact</text>
-      {/* Colour legend */}
       <defs>
         <linearGradient id="beeGrad" x1="0" y1="0" x2="1" y2="0">
           <stop offset="0%"   stopColor="#3b82f6" />
@@ -235,7 +229,7 @@ function DirectionTable({ features, n = 12 }) {
         const isRisk = f.direction === 'risk'
         return (
           <div key={f.feature} className="flex items-center justify-between py-1.5 border-b border-slate-100 last:border-0">
-            <span className="text-xs text-slate-600 font-medium truncate max-w-[160px]">{label(f.feature)}</span>
+            <span className="text-xs text-slate-600 dark:text-slate-300 font-medium truncate max-w-[160px]">{label(f.feature)}</span>
             {isRisk
               ? <span className="flex items-center gap-1 text-xs font-bold text-red-600 shrink-0">
                   <span className="material-symbols-outlined text-[14px]">trending_up</span>Increases Risk
@@ -262,9 +256,9 @@ function WaterfallChart({ baseProbability, finalProb, contributions }) {
   const maxAbs = Math.max(...items.map((c) => Math.abs(c.contribution_prob)), 0.001)
 
   const ROW_H  = 34
-  const PAD_L  = 168  // label column width
-  const BAR_HALF = 220 // half the bar area (bars extend left or right from center)
-  const PAD_R  = 68   // right column for value
+  const PAD_L  = 168
+  const BAR_HALF = 220
+  const PAD_R  = 68
   const PAD_T  = 8
   const PAD_B  = 28
   const W = PAD_L + BAR_HALF * 2 + PAD_R
@@ -281,7 +275,6 @@ function WaterfallChart({ baseProbability, finalProb, contributions }) {
   return (
     <div className="overflow-x-auto rounded-lg border border-slate-100 bg-slate-50 p-2">
       <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ fontFamily: 'Inter, sans-serif' }}>
-        {/* Zero / base line */}
         <line x1={ZERO_X} y1={PAD_T} x2={ZERO_X} y2={H - PAD_B + 6} stroke="#cbd5e1" strokeWidth="1.5" strokeDasharray="4 3" />
 
         {items.map((c, i) => {
@@ -299,26 +292,20 @@ function WaterfallChart({ baseProbability, finalProb, contributions }) {
 
           return (
             <g key={c.feature}>
-              {/* Row background (alternating) */}
               {i % 2 === 0 && <rect x={0} y={y + 1} width={W} height={ROW_H - 2} fill="#f8fafc" rx="2" />}
-              {/* Feature label */}
               <text
                 x={PAD_L - 10} y={y + ROW_H * 0.62}
                 textAnchor="end" fontSize="10.5" fill="#334155" fontWeight="500"
               >{shortLbl}</text>
-              {/* Bar background track */}
               <rect x={ZERO_X - BAR_HALF + 4} y={y + 8} width={BAR_HALF * 2 - 8} height={ROW_H - 16} fill="#f1f5f9" rx="3" />
-              {/* Coloured bar */}
               <rect x={barX} y={y + 8} width={Math.max(bw, 2)} height={ROW_H - 16} fill={fillBg} rx="3" />
               <rect x={barX} y={y + 10} width={Math.max(bw, 2)} height={ROW_H - 20} fill={fill} rx="2" opacity="0.85" />
-              {/* Contribution % */}
               <text
                 x={isPos ? barX + bw + 6 : barX - 6}
                 y={y + ROW_H * 0.62}
                 textAnchor={isPos ? 'start' : 'end'}
                 fontSize="10" fill={textCol} fontWeight="700"
               >{sign}{pct}%</text>
-              {/* Raw value on far right */}
               <text x={W - 4} y={y + ROW_H * 0.62} textAnchor="end" fontSize="9.5" fill="#94a3b8">
                 {fmt(c.raw_value)}
               </text>
@@ -326,11 +313,9 @@ function WaterfallChart({ baseProbability, finalProb, contributions }) {
           )
         })}
 
-        {/* X-axis labels */}
         <text x={ZERO_X}                  y={H - 8} textAnchor="middle" fontSize="8.5" fill="#94a3b8">0%</text>
         <text x={ZERO_X - BAR_HALF + 12}  y={H - 8} textAnchor="start"  fontSize="8.5" fill="#3b82f6">← Lowers risk</text>
         <text x={ZERO_X + BAR_HALF - 12}  y={H - 8} textAnchor="end"    fontSize="8.5" fill="#ef4444">Raises risk →</text>
-        {/* Raw value column header */}
         <text x={W - 4} y={PAD_T - 2} textAnchor="end" fontSize="8" fill="#cbd5e1" fontWeight="600">VALUE</text>
       </svg>
     </div>
@@ -381,7 +366,7 @@ function RelationshipsInsights({ features }) {
       {insights.map((ins, i) => (
         <motion.div
           key={ins.title}
-          className={`rounded-xl border p-5 ${ins.bg}`}
+          className={`rounded-2xl border p-5 ${ins.bg}`}
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: i * 0.06, duration: 0.3 }}
@@ -390,7 +375,7 @@ function RelationshipsInsights({ features }) {
             <span className="material-symbols-outlined text-[20px]">{ins.icon}</span>
             <span className="font-bold text-sm">{ins.title}</span>
           </div>
-          <p className="text-xs text-slate-600 leading-relaxed mb-3">{ins.body}</p>
+          <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mb-3">{ins.body}</p>
           <span className="text-[10px] font-bold uppercase tracking-wide text-slate-400">{ins.stat}</span>
         </motion.div>
       ))}
@@ -432,7 +417,7 @@ function EmployeeSelector({ employees, selectedId, onSelect }) {
     <div className="relative">
       <button
         onClick={handleOpen}
-        className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-700 hover:border-blue-400 transition-colors shadow-sm min-w-[200px] justify-between"
+        className="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-300 hover:border-blue-400 dark:hover:border-blue-500 transition-colors shadow-sm min-w-[200px] justify-between"
       >
         <div className="flex items-center gap-2">
           <span className="material-symbols-outlined text-[18px] text-slate-400">person</span>
@@ -444,13 +429,12 @@ function EmployeeSelector({ employees, selectedId, onSelect }) {
       <AnimatePresence>
         {open && (
           <motion.div
-            className="absolute right-0 top-full mt-2 w-72 bg-white border border-slate-200 rounded-xl shadow-xl z-50 overflow-hidden"
+            className="absolute right-0 top-full mt-2 w-72 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl z-50 overflow-hidden"
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.15 }}
           >
-            {/* Search box */}
             <div className="p-2 border-b border-slate-100">
               <div className="relative">
                 <span className="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[15px] text-slate-400">search</span>
@@ -460,13 +444,12 @@ function EmployeeSelector({ employees, selectedId, onSelect }) {
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search employees…"
-                  className="w-full pl-8 pr-3 py-1.5 text-xs border border-slate-200 rounded-lg focus:ring-1 focus:ring-blue-400 outline-none"
+                  className="w-full pl-8 pr-3 py-1.5 text-xs border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-1 focus:ring-blue-400 outline-none bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300"
                 />
               </div>
             </div>
 
             <div className="max-h-60 overflow-y-auto">
-              {/* Demo always visible when not searching */}
               {!search.trim() && (
                 <button
                   onClick={() => { onSelect('demo'); setOpen(false); setSearch('') }}
@@ -549,7 +532,7 @@ function SummaryPanel({ emp }) {
       {cards.map((c, i) => (
         <motion.div
           key={c.label}
-          className="bg-white border border-slate-200 rounded-xl p-4 flex items-start gap-3"
+          className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex items-start gap-3 shadow-sm"
           initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: i * 0.06 }}
         >
@@ -584,8 +567,8 @@ function EmptyExplanation() {
 // Tab styles
 // ─────────────────────────────────────────────────────────────────────────────
 const TAB_BASE   = 'px-5 py-3 text-sm font-semibold border-b-2 transition-colors cursor-pointer whitespace-nowrap'
-const TAB_ACTIVE = 'border-blue-700 text-blue-700'
-const TAB_IDLE   = 'border-transparent text-slate-500 hover:text-slate-700'
+const TAB_ACTIVE = 'border-blue-700 dark:border-blue-400 text-blue-700 dark:text-blue-400'
+const TAB_IDLE   = 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Main page
@@ -597,7 +580,6 @@ export default function ModelSHAP() {
   const [apiShapRaw, setApiShapRaw] = useState(null)
   const [shapLoading, setShapLoading] = useState(false)
 
-  // Load from Firestore (same pattern as RiskWatch)
   useEffect(() => {
     const q = query(collection(db, 'predictions'), orderBy('timestamp', 'desc'), limit(100))
     const unsub = onSnapshot(q,
@@ -611,7 +593,6 @@ export default function ModelSHAP() {
     ? DEMO_EMPLOYEE
     : employees.find((e) => e.id === selectedId) ?? null
 
-  // Fetch SHAP from API when employee changes (with client-side fallback)
   useEffect(() => {
     if (!emp) { setApiShapRaw(null); return }
     setApiShapRaw(null)
@@ -622,7 +603,6 @@ export default function ModelSHAP() {
       .finally(() => setShapLoading(false))
   }, [emp?.id])
 
-  // Transform API response → same shape as computeShap()
   const apiShap = useMemo(() => {
     if (!apiShapRaw) return null
     const contributions = (apiShapRaw.shap_values ?? []).map((v) => ({
@@ -650,12 +630,10 @@ export default function ModelSHAP() {
     }
   }, [apiShapRaw])
 
-  // Prefer API result; fall back to client-side computation
   const clientShap = useMemo(() => (emp ? computeShap(emp) : null), [emp?.id, emp?.probability])
   const shap = apiShap ?? clientShap
   const shapSource = shapLoading ? 'loading' : apiShap ? 'api' : 'client'
 
-  // Feature importance sorted list
   const importanceFeatures = useMemo(
     () => [...(featureData.features ?? [])].sort((a, b) => b.perm_auc_drop - a.perm_auc_drop),
     []
@@ -668,13 +646,13 @@ export default function ModelSHAP() {
       {/* ── Page Header ───────────────────────────────────────────────── */}
       <div className="mb-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
-          <nav className="flex items-center gap-2 text-[11px] text-slate-400 mb-2 uppercase tracking-wide">
+          <nav className="flex items-center gap-2 text-[11px] text-slate-400 mb-2 uppercase tracking-widest font-semibold">
             <span>Analytics</span>
             <span className="material-symbols-outlined text-[13px]">chevron_right</span>
-            <span className="text-blue-700">Model Interpretability</span>
+            <span className="text-blue-600 dark:text-blue-400">Model Interpretability</span>
           </nav>
-          <h2 className="text-2xl font-extrabold text-slate-900">Model Interpretability (SHAP)</h2>
-          <p className="text-sm text-slate-500 mt-1">Understand what drives attrition predictions</p>
+          <h2 className="text-3xl font-black tracking-tight text-primary dark:text-blue-400">Model Interpretability (SHAP)</h2>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Understand what drives attrition predictions</p>
         </div>
         <div className="flex items-center gap-3 shrink-0">
           <span className="text-xs font-medium text-slate-500">Select Employee</span>
@@ -687,7 +665,7 @@ export default function ModelSHAP() {
 
       {/* ── Tabs ──────────────────────────────────────────────────────── */}
       <Tabs.Root value={tab} onValueChange={setTab}>
-        <Tabs.List className="flex border-b border-slate-200 mb-6 overflow-x-auto">
+        <Tabs.List className="flex border-b border-slate-200 dark:border-slate-700 mb-6 overflow-x-auto">
           <Tabs.Trigger value="global"        className={`${TAB_BASE} ${tab === 'global'        ? TAB_ACTIVE : TAB_IDLE}`}>Global Insights</Tabs.Trigger>
           <Tabs.Trigger value="employee"      className={`${TAB_BASE} ${tab === 'employee'      ? TAB_ACTIVE : TAB_IDLE}`}>Employee Explanation</Tabs.Trigger>
           <Tabs.Trigger value="relationships" className={`${TAB_BASE} ${tab === 'relationships' ? TAB_ACTIVE : TAB_IDLE}`}>Feature Relationships</Tabs.Trigger>
@@ -697,10 +675,10 @@ export default function ModelSHAP() {
         <Tabs.Content value="global">
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
             {/* 1. Global Feature Importance */}
-            <div className="bg-white border border-slate-200 rounded-xl p-5">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm p-5">
               <div className="flex items-center gap-2 mb-4">
-                <span className="material-symbols-outlined text-[18px] text-blue-600">bar_chart</span>
-                <h3 className="font-bold text-sm text-slate-800">1. Global Feature Importance</h3>
+                <span className="material-symbols-outlined text-[18px] text-blue-600 dark:text-blue-400">bar_chart</span>
+                <h3 className="font-bold text-sm text-slate-800 dark:text-slate-200">1. Global Feature Importance</h3>
               </div>
               <p className="text-[11px] text-slate-400 mb-4">Mean AUC drop (permutation importance, 30 repeats)</p>
               <GlobalImportanceChart features={importanceFeatures} n={10} />
@@ -711,20 +689,20 @@ export default function ModelSHAP() {
             </div>
 
             {/* 2. SHAP Summary Plot */}
-            <div className="bg-white border border-slate-200 rounded-xl p-5">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm p-5">
               <div className="flex items-center gap-2 mb-4">
-                <span className="material-symbols-outlined text-[18px] text-purple-600">scatter_plot</span>
-                <h3 className="font-bold text-sm text-slate-800">2. SHAP Summary Plot</h3>
+                <span className="material-symbols-outlined text-[18px] text-purple-600 dark:text-purple-400">scatter_plot</span>
+                <h3 className="font-bold text-sm text-slate-800 dark:text-slate-200">2. SHAP Summary Plot</h3>
               </div>
               <p className="text-[11px] text-slate-400 mb-4">Each point is one employee · colour = feature value magnitude</p>
               <BeeswarmPlot beeswarmData={beeswarmData} n={10} />
             </div>
 
             {/* 3. Feature Impact Direction */}
-            <div className="bg-white border border-slate-200 rounded-xl p-5">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm p-5">
               <div className="flex items-center gap-2 mb-4">
-                <span className="material-symbols-outlined text-[18px] text-green-600">compare_arrows</span>
-                <h3 className="font-bold text-sm text-slate-800">3. Feature Impact Direction</h3>
+                <span className="material-symbols-outlined text-[18px] text-green-600 dark:text-green-400">compare_arrows</span>
+                <h3 className="font-bold text-sm text-slate-800 dark:text-slate-200">3. Feature Impact Direction</h3>
               </div>
               <p className="text-[11px] text-slate-400 mb-4">How feature values push attrition predictions</p>
               <div className="grid grid-cols-2 gap-x-3 text-[11px] font-bold text-slate-400 uppercase mb-2 pb-1 border-b border-slate-200">
@@ -748,11 +726,11 @@ export default function ModelSHAP() {
               transition={{ duration: 0.2 }}
             >
               {/* Force plot card */}
-              <div className="bg-white border border-slate-200 rounded-xl p-6">
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm p-6">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <span className="material-symbols-outlined text-[18px] text-orange-500">waterfall_chart</span>
-                    <h3 className="font-bold text-sm text-slate-800">4. Employee Explanation (Local SHAP)</h3>
+                    <h3 className="font-bold text-sm text-slate-800 dark:text-slate-200">4. Employee Explanation (Local SHAP)</h3>
                   </div>
                   {/* Source indicator */}
                   <div className="flex items-center gap-1.5">
@@ -779,7 +757,7 @@ export default function ModelSHAP() {
                 <div className="flex flex-wrap gap-6 mb-6">
                   <div>
                     <p className="text-[10px] uppercase font-bold text-slate-400">Base Value</p>
-                    <p className="text-xl font-extrabold text-slate-700">{(shap.baseProbability * 100).toFixed(1)}%</p>
+                    <p className="text-xl font-extrabold text-slate-700 dark:text-slate-200">{(shap.baseProbability * 100).toFixed(1)}%</p>
                     <p className="text-[10px] text-slate-400">Average prediction</p>
                   </div>
                   <div>
@@ -805,8 +783,8 @@ export default function ModelSHAP() {
               </div>
 
               {/* Feature contribution table */}
-              <div className="bg-white border border-slate-200 rounded-xl p-6">
-                <h3 className="font-bold text-sm text-slate-800 mb-4">Top Feature Contributions</h3>
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm p-6">
+                <h3 className="font-bold text-sm text-slate-800 dark:text-slate-200 mb-4">Top Feature Contributions</h3>
                 <div className="space-y-3">
                   {shap.contributions.map((c, i) => {
                     const pct   = (c.contribution_prob * 100).toFixed(1)
@@ -816,7 +794,7 @@ export default function ModelSHAP() {
                       <div key={c.feature} className="flex items-center gap-3">
                         <span className="w-5 text-xs font-bold text-slate-300 text-right">{i + 1}</span>
                         <span className="w-40 text-xs text-slate-600 font-medium truncate">{label(c.feature)}</span>
-                        <div className="flex-1 h-5 bg-slate-50 rounded-full overflow-hidden">
+                        <div className="flex-1 h-5 bg-slate-50 dark:bg-slate-800 rounded-full overflow-hidden">
                           <motion.div
                             className={`h-full rounded-full ${isPos ? 'bg-red-400' : 'bg-blue-400'}`}
                             initial={{ width: 0 }}
@@ -858,8 +836,8 @@ export default function ModelSHAP() {
             <p className="text-sm text-slate-500">Key drivers of attrition — model insights and business implications</p>
             <RelationshipsInsights features={importanceFeatures} />
             {/* Method comparison table */}
-            <div className="bg-white border border-slate-200 rounded-xl p-6 mt-2">
-              <h3 className="font-bold text-sm text-slate-800 mb-4">Consensus Ranking — Three-Method Agreement</h3>
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm p-6 mt-2">
+              <h3 className="font-bold text-sm text-slate-800 dark:text-slate-200 mb-4">Consensus Ranking — Three-Method Agreement</h3>
               <div className="overflow-x-auto">
                 <table className="w-full text-xs">
                   <thead>

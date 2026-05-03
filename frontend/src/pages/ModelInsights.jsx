@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { getInsights } from '../api'
 
-// â”€â”€ Fallback static data (shown while API is loading / unavailable) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Fallback static data (shown while API is loading / unavailable) ──────────
 const STATIC_METRICS = [
   { label: 'Test AUC',   value: '0.780', icon: 'show_chart',              color: 'text-blue-700' },
   { label: 'Test F1',    value: '0.615', icon: 'target',                  color: 'text-purple-600' },
@@ -13,7 +13,6 @@ const STATIC_METRICS = [
 ]
 
 const STATIC_BENCHMARKS = [
-  // Phase 11 optimal thresholds — test-set metrics at each model's best Val-F1 threshold
   { name: 'Logistic Regression', threshold: 0.26, acc: 0.864, prec: 0.571, recall: 0.667, f1: 0.615, auc: 0.780, selected: true },
   { name: 'glmnet Ridge',        threshold: 0.18, acc: 0.795, prec: 0.418, recall: 0.639, f1: 0.505, auc: 0.821, selected: false },
   { name: 'SVM',                 threshold: 0.18, acc: 0.809, prec: 0.438, recall: 0.583, f1: 0.500, auc: 0.857, selected: false },
@@ -23,42 +22,43 @@ const STATIC_BENCHMARKS = [
 ]
 
 const PRIORITY_STYLES = {
-  critical: { bg: 'bg-red-50 border-red-200',   badge: 'bg-red-100 text-red-700',   icon: 'âš¡' },
-  high:     { bg: 'bg-amber-50 border-amber-200', badge: 'bg-amber-100 text-amber-700', icon: 'âš ï¸' },
-  medium:   { bg: 'bg-blue-50 border-blue-200',  badge: 'bg-blue-100 text-blue-700', icon: 'ðŸ’¡' },
+  critical: { bg: 'bg-red-50 dark:bg-red-500/10 border-red-200 dark:border-red-500/30',     badge: 'bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400',     icon: '⚡' },
+  high:     { bg: 'bg-amber-50 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/30', badge: 'bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400', icon: '⚠️' },
+  medium:   { bg: 'bg-blue-50 dark:bg-blue-500/10 border-blue-200 dark:border-blue-500/30',   badge: 'bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400',   icon: '💡' },
 }
 
-// â”€â”€ Sub-components â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Sub-components ────────────────────────────────────────────────────────────
 
 function MetricCard({ label, value, icon, color, index = 0 }) {
   return (
     <motion.div
-      className="bg-white border border-slate-200 rounded-xl p-6 flex items-center gap-4"
+      className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow"
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, delay: index * 0.07, ease: 'easeOut' }}
     >
-      <div className={`w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center ${color}`}>
+      <div className={`w-12 h-12 rounded-xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center ${color}`}>
         <span className="material-symbols-outlined text-[24px]">{icon}</span>
       </div>
       <div>
-        <p className="text-label-md text-secondary uppercase">{label}</p>
-        <p className={`text-headline-lg font-bold ${color}`}>{value}</p>
+        <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{label}</p>
+        <p className={`text-2xl font-black ${color}`}>{value}</p>
       </div>
     </motion.div>
   )
 }
 
 function MetricBadge({ value, isBest }) {
-  const bg = isBest ? 'bg-blue-700 text-white' : 'text-slate-700'
   return (
-    <span className={`font-data-tabular text-right tabular-nums ${bg} ${isBest ? 'px-2 py-0.5 rounded' : ''}`}>
+    <span className={`font-bold text-right tabular-nums ${
+      isBest ? 'bg-blue-700 text-white px-2 py-0.5 rounded-lg' : 'text-slate-700 dark:text-slate-300'
+    }`}>
       {value}
     </span>
   )
 }
 
-// â”€â”€ Page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function ModelInsights() {
   const [insights, setInsights]   = useState(null)
@@ -73,14 +73,13 @@ export default function ModelInsights() {
       .catch(() => { setApiError(true); setLoading(false) })
   }, [])
 
-  // Build display values — use live data when available, fall back to statics
   const benchmarks = insights?.model_comparison ?? STATIC_BENCHMARKS
   const selectedBenchmark = benchmarks.find(m => m.name === selectedModelName) ?? benchmarks[0]
   const isLRSelected = selectedModelName === 'Logistic Regression'
   const cm         = isLRSelected ? (insights?.confusion_matrix ?? { tn: 166, fp: 18, fn: 12, tp: 24 }) : null
   const predictors = insights?.top_predictors    ?? []
-  const recommendations   = insights?.hr_recommendations   ?? []
-  const ethicalItems      = insights?.ethical_implications ?? []
+  const recommendations  = insights?.hr_recommendations   ?? []
+  const ethicalItems     = insights?.ethical_implications ?? []
 
   const metrics = isLRSelected
     ? (insights
@@ -103,10 +102,10 @@ export default function ModelInsights() {
       ]
 
   const tabs = [
-    { id: 'overview',         label: 'Overview' },
-    { id: 'predictors',       label: 'Top Predictors' },
-    { id: 'recommendations',  label: 'HR Recommendations' },
-    { id: 'ethics',           label: 'Ethics' },
+    { id: 'overview',        label: 'Overview' },
+    { id: 'predictors',      label: 'Top Predictors' },
+    { id: 'recommendations', label: 'HR Recommendations' },
+    { id: 'ethics',          label: 'Ethics' },
   ]
 
   return (
@@ -114,40 +113,39 @@ export default function ModelInsights() {
       {/* Header */}
       <div className="mb-6 flex items-end justify-between">
         <div>
-          <nav className="flex items-center gap-2 text-label-md text-slate-400 mb-2 uppercase">
+          <nav className="flex items-center gap-2 text-[11px] text-slate-400 mb-3 uppercase tracking-widest font-semibold">
             <span>Analytics</span>
             <span className="material-symbols-outlined text-[14px]">chevron_right</span>
-            <span className="text-blue-700">Model Insights</span>
+            <span className="text-blue-600 dark:text-blue-400">Model Insights</span>
           </nav>
-          <h2 className="text-headline-xl font-bold text-primary">Model Evaluation Dashboard</h2>
-          <p className="text-body-lg text-secondary mt-1">
+          <h2 className="text-3xl font-black tracking-tight text-primary dark:text-blue-400">Model Evaluation Dashboard</h2>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
             Comparative analysis, HR recommendations and ethical review for the attrition model.
           </p>
         </div>
         {loading && (
-          <div className="text-xs text-blue-700 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 flex items-center gap-2">
+          <div className="text-xs text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/30 rounded-xl px-3 py-2 flex items-center gap-2">
             <motion.span
               className="material-symbols-outlined text-[16px]"
               animate={{ rotate: 360 }}
               transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
             >refresh</motion.span>
-            Loading live insightsâ€¦
+            Loading live insights…
           </div>
         )}
       </div>
 
       {/* Model selector + KPI strip */}
       <section className="mb-6">
-        {/* Model selector pills */}
         <div className="flex flex-wrap gap-2 mb-4">
           {(insights?.model_comparison ?? STATIC_BENCHMARKS).map(m => (
             <button
               key={m.name}
               onClick={() => setSelectedModelName(m.name)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
                 selectedModelName === m.name
-                  ? 'bg-primary text-white border-primary shadow-sm'
-                  : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700'
+                  ? 'bg-primary text-white border-primary shadow-sm shadow-blue-900/20'
+                  : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'
               }`}
             >
               {m.name}
@@ -155,7 +153,7 @@ export default function ModelInsights() {
             </button>
           ))}
         </div>
-        <h3 className="text-label-md uppercase text-secondary mb-4">
+        <h3 className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-4">
           {selectedModelName} — {isLRSelected ? 'Test Set Performance' : 'Validation Set Performance'}
         </h3>
         <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
@@ -164,15 +162,15 @@ export default function ModelInsights() {
       </section>
 
       {/* Tabs */}
-      <div className="flex gap-1 mb-6 bg-slate-100 p-1 rounded-xl w-fit">
+      <div className="flex gap-1 mb-6 bg-slate-100 dark:bg-slate-800/60 p-1 rounded-xl w-fit">
         {tabs.map(tab => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
               activeTab === tab.id
-                ? 'bg-white text-primary shadow-sm'
-                : 'text-slate-500 hover:text-slate-700'
+                ? 'bg-white dark:bg-slate-700 text-primary dark:text-blue-300 shadow-sm'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
             }`}
           >
             {tab.label}
@@ -181,24 +179,24 @@ export default function ModelInsights() {
       </div>
 
       <AnimatePresence mode="wait">
-        {/* â”€â”€ OVERVIEW TAB â”€â”€ */}
+        {/* ── OVERVIEW TAB ── */}
         {activeTab === 'overview' && (
           <motion.div key="overview" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
             <div className="grid grid-cols-12 gap-6 mb-8">
               {/* Benchmarks table */}
-              <div className={`col-span-12 ${isLRSelected ? "lg:col-span-8" : "lg:col-span-12"} bg-white border border-slate-200 rounded-xl overflow-hidden`}>
-                <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                  <h3 className="text-headline-md font-semibold text-primary">Model Benchmarks</h3>
-                  <span className="bg-blue-900 text-white text-[10px] px-2 py-1 rounded font-bold uppercase tracking-wider">
-                    Validation Set Â· Optimal Thresholds
+              <div className={`col-span-12 ${isLRSelected ? 'lg:col-span-8' : 'lg:col-span-12'} bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm`}>
+                <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/60 dark:bg-slate-900/60">
+                  <h3 className="text-base font-bold text-primary dark:text-blue-400">Model Benchmarks</h3>
+                  <span className="bg-blue-900 text-white text-[10px] px-2 py-1 rounded-lg font-bold uppercase tracking-wider">
+                    Validation Set · Optimal Thresholds
                   </span>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full border-collapse">
                     <thead>
-                      <tr className="bg-slate-50">
+                      <tr className="bg-slate-50 dark:bg-slate-800/50">
                         {['Model Name','Threshold','Accuracy','Precision','Recall','F1 Score','AUC'].map(h => (
-                          <th key={h} className={`p-4 font-label-md text-label-md text-secondary border-b border-slate-200 ${h === 'Model Name' ? 'text-left' : 'text-right'}`}>{h}</th>
+                          <th key={h} className={`px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-700 ${h === 'Model Name' ? 'text-left' : 'text-right'}`}>{h}</th>
                         ))}
                       </tr>
                     </thead>
@@ -206,79 +204,80 @@ export default function ModelInsights() {
                       {benchmarks.map(m => {
                         const isHighlighted = m.name === selectedModelName
                         return (
-                        <tr key={m.name} className={`border-b border-slate-100 hover:bg-slate-50 transition-colors ${isHighlighted ? 'bg-blue-50/40' : ''}`}>
-                          <td className="p-4 font-semibold text-primary flex items-center gap-2">
-                            {m.name}
-                            {m.selected && <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-bold">Deployed</span>}
-                            {isHighlighted && !m.selected && <span className="text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded font-bold">Viewing</span>}
-                          </td>
-                          <td className="p-4 text-right tabular-nums">{m.threshold}</td>
-                          <td className="p-4 text-right tabular-nums">{Number(m.acc).toFixed(3)}</td>
-                          <td className="p-4 text-right tabular-nums">{Number(m.prec).toFixed(3)}</td>
-                          <td className="p-4 text-right tabular-nums">{Number(m.recall).toFixed(3)}</td>
-                          <td className="p-4 text-right"><MetricBadge value={Number(m.f1).toFixed(3)} isBest={isHighlighted} /></td>
-                          <td className="p-4 text-right text-blue-700 font-bold tabular-nums">{Number(m.auc).toFixed(3)}</td>
-                        </tr>
-                      )})}
+                          <tr key={m.name} className={`border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors ${isHighlighted ? 'bg-blue-50/40 dark:bg-blue-500/5' : ''}`}>
+                            <td className="px-4 py-3.5 font-semibold text-primary dark:text-blue-400 flex items-center gap-2">
+                              {m.name}
+                              {m.selected && <span className="text-[10px] bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400 px-1.5 py-0.5 rounded-lg font-bold">Deployed</span>}
+                              {isHighlighted && !m.selected && <span className="text-[10px] bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400 px-1.5 py-0.5 rounded-lg font-bold">Viewing</span>}
+                            </td>
+                            <td className="px-4 py-3.5 text-right tabular-nums text-slate-700 dark:text-slate-300">{m.threshold}</td>
+                            <td className="px-4 py-3.5 text-right tabular-nums text-slate-700 dark:text-slate-300">{Number(m.acc).toFixed(3)}</td>
+                            <td className="px-4 py-3.5 text-right tabular-nums text-slate-700 dark:text-slate-300">{Number(m.prec).toFixed(3)}</td>
+                            <td className="px-4 py-3.5 text-right tabular-nums text-slate-700 dark:text-slate-300">{Number(m.recall).toFixed(3)}</td>
+                            <td className="px-4 py-3.5 text-right"><MetricBadge value={Number(m.f1).toFixed(3)} isBest={isHighlighted} /></td>
+                            <td className="px-4 py-3.5 text-right text-blue-700 dark:text-blue-400 font-bold tabular-nums">{Number(m.auc).toFixed(3)}</td>
+                          </tr>
+                        )
+                      })}
                     </tbody>
                   </table>
                 </div>
               </div>
 
               {isLRSelected && cm ? (
-              <div className="col-span-12 lg:col-span-4 bg-white border border-slate-200 rounded-xl flex flex-col">
-                <div className="p-4 border-b border-slate-100">
-                  <h3 className="text-headline-md font-semibold text-primary">Confusion Matrix</h3>
-                  <p className="text-xs text-secondary">Logistic Regression — Test Set (n=220)</p>
-                </div>
-                <div className="p-6 flex-1 flex flex-col justify-center">
-                  <div className="text-center text-label-md text-secondary uppercase mb-3">Predicted</div>
-                  <div className="grid grid-cols-2 gap-2 mb-3">
-                    <div className="p-4 bg-green-50 border border-green-200 rounded-xl text-center">
-                      <p className="text-[10px] font-bold text-green-700 uppercase mb-1">True Negative</p>
-                      <p className="text-[40px] font-black text-green-700 leading-none">{cm.tn}</p>
-                      <p className="text-[10px] text-green-600 mt-1">Predicted No · Actual No</p>
-                    </div>
-                    <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-center">
-                      <p className="text-[10px] font-bold text-red-500 uppercase mb-1">False Positive</p>
-                      <p className="text-[40px] font-black text-red-400 leading-none">{cm.fp}</p>
-                      <p className="text-[10px] text-red-400 mt-1">Predicted Yes · Actual No</p>
-                    </div>
-                    <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-center">
-                      <p className="text-[10px] font-bold text-amber-600 uppercase mb-1">False Negative</p>
-                      <p className="text-[40px] font-black text-amber-500 leading-none">{cm.fn}</p>
-                      <p className="text-[10px] text-amber-500 mt-1">Predicted No · Actual Yes</p>
-                    </div>
-                    <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl text-center">
-                      <p className="text-[10px] font-bold text-blue-700 uppercase mb-1">True Positive</p>
-                      <p className="text-[40px] font-black text-blue-700 leading-none">{cm.tp}</p>
-                      <p className="text-[10px] text-blue-600 mt-1">Predicted Yes · Actual Yes</p>
-                    </div>
+                <div className="col-span-12 lg:col-span-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col shadow-sm">
+                  <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800">
+                    <h3 className="text-base font-bold text-primary dark:text-blue-400">Confusion Matrix</h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Logistic Regression — Test Set (n=220)</p>
                   </div>
-                  <p className="text-[11px] text-secondary text-center">
-                    The model correctly identifies <strong>{Math.round(cm.tp / (cm.tp + cm.fn) * 100)}%</strong> of actual leavers (recall).
-                  </p>
+                  <div className="p-6 flex-1 flex flex-col justify-center">
+                    <div className="text-center text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3">Predicted</div>
+                    <div className="grid grid-cols-2 gap-2 mb-3">
+                      <div className="p-4 bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/30 rounded-2xl text-center">
+                        <p className="text-[10px] font-bold text-green-700 dark:text-green-400 uppercase mb-1">True Negative</p>
+                        <p className="text-[40px] font-black text-green-700 dark:text-green-400 leading-none">{cm.tn}</p>
+                        <p className="text-[10px] text-green-600 mt-1">Predicted No · Actual No</p>
+                      </div>
+                      <div className="p-4 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-2xl text-center">
+                        <p className="text-[10px] font-bold text-red-500 dark:text-red-400 uppercase mb-1">False Positive</p>
+                        <p className="text-[40px] font-black text-red-400 leading-none">{cm.fp}</p>
+                        <p className="text-[10px] text-red-400 mt-1">Predicted Yes · Actual No</p>
+                      </div>
+                      <div className="p-4 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 rounded-2xl text-center">
+                        <p className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase mb-1">False Negative</p>
+                        <p className="text-[40px] font-black text-amber-500 leading-none">{cm.fn}</p>
+                        <p className="text-[10px] text-amber-500 mt-1">Predicted No · Actual Yes</p>
+                      </div>
+                      <div className="p-4 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/30 rounded-2xl text-center">
+                        <p className="text-[10px] font-bold text-blue-700 dark:text-blue-400 uppercase mb-1">True Positive</p>
+                        <p className="text-[40px] font-black text-blue-700 dark:text-blue-400 leading-none">{cm.tp}</p>
+                        <p className="text-[10px] text-blue-600 dark:text-blue-500 mt-1">Predicted Yes · Actual Yes</p>
+                      </div>
+                    </div>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 text-center">
+                      The model correctly identifies <strong>{Math.round(cm.tp / (cm.tp + cm.fn) * 100)}%</strong> of actual leavers (recall).
+                    </p>
+                  </div>
                 </div>
-              </div>
               ) : !isLRSelected ? (
-              <div className="col-span-12 lg:col-span-4 bg-white border border-slate-200 rounded-xl flex flex-col items-center justify-center p-8 text-center">
-                <span className="material-symbols-outlined text-slate-300 text-[48px] mb-3">grid_off</span>
-                <p className="text-sm font-semibold text-slate-500 mb-1">No Confusion Matrix</p>
-                <p className="text-xs text-secondary">Confusion matrix data is only available for the deployed Logistic Regression model.</p>
-              </div>
+                <div className="col-span-12 lg:col-span-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm flex flex-col items-center justify-center p-8 text-center">
+                  <span className="material-symbols-outlined text-slate-300 dark:text-slate-600 text-[48px] mb-3">grid_off</span>
+                  <p className="text-sm font-bold text-slate-500 dark:text-slate-400 mb-1">No Confusion Matrix</p>
+                  <p className="text-xs text-slate-400 dark:text-slate-500">Confusion matrix data is only available for the deployed Logistic Regression model.</p>
+                </div>
               ) : null}
             </div>
 
             {/* F1 bar chart */}
-            <div className="bg-white border border-slate-200 rounded-xl p-6">
-              <h3 className="text-headline-md font-semibold text-primary mb-6">F1 Score Comparison</h3>
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm p-6">
+              <h3 className="text-base font-bold text-primary dark:text-blue-400 mb-6">F1 Score Comparison</h3>
               <div className="space-y-3">
                 {[...benchmarks].sort((a, b) => b.f1 - a.f1).map(m => (
                   <div key={m.name} className="flex items-center gap-4">
-                    <span className={`w-44 text-body-md text-right shrink-0 ${m.name === selectedModelName ? 'font-bold text-primary' : 'text-slate-600'}`}>{m.name}</span>
-                    <div className="flex-1 h-7 bg-slate-100 rounded-full overflow-hidden">
+                    <span className={`w-44 text-sm text-right shrink-0 ${m.name === selectedModelName ? 'font-bold text-primary dark:text-blue-400' : 'text-slate-600 dark:text-slate-400'}`}>{m.name}</span>
+                    <div className="flex-1 h-7 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                       <motion.div
-                        className={`h-full rounded-full flex items-center px-3 ${m.name === selectedModelName ? 'bg-primary' : 'bg-slate-400'}`}
+                        className={`h-full rounded-full flex items-center px-3 ${m.name === selectedModelName ? 'bg-primary' : 'bg-slate-400 dark:bg-slate-600'}`}
                         initial={{ width: 0 }}
                         animate={{ width: `${(m.f1 / 0.7) * 100}%` }}
                         transition={{ duration: 0.7, ease: 'easeOut' }}
@@ -293,19 +292,19 @@ export default function ModelInsights() {
           </motion.div>
         )}
 
-        {/* â”€â”€ PREDICTORS TAB â”€â”€ */}
+        {/* ── PREDICTORS TAB ── */}
         {activeTab === 'predictors' && (
           <motion.div key="predictors" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
-            <div className="bg-white border border-slate-200 rounded-xl p-6">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm p-6">
               <div className="flex items-center gap-2 mb-2">
-                <span className="material-symbols-outlined text-primary text-[22px]">bar_chart</span>
-                <h3 className="text-headline-md font-semibold text-primary">Top Predictors â€” Logistic Regression Coefficients</h3>
+                <span className="material-symbols-outlined text-primary dark:text-blue-400 text-[22px]">bar_chart</span>
+                <h3 className="text-base font-bold text-primary dark:text-blue-400">Top Predictors — Logistic Regression Coefficients</h3>
               </div>
-              <p className="text-sm text-secondary mb-6">
+              <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
                 Positive coefficients increase attrition probability; negative coefficients are protective. Magnitude reflects relative importance.
               </p>
               {predictors.length === 0 && (
-                <p className="text-secondary text-sm italic">Start the R API to load live coefficients.</p>
+                <p className="text-slate-400 dark:text-slate-500 text-sm italic">Start the R API to load live coefficients.</p>
               )}
               <div className="space-y-3">
                 {predictors.map((f, i) => {
@@ -321,12 +320,12 @@ export default function ModelInsights() {
                       className="flex items-center gap-4"
                     >
                       <div className="w-52 text-right shrink-0">
-                        <p className="text-sm font-medium text-on-surface leading-tight">{f.label}</p>
-                        <p className={`text-xs font-bold ${isRisk ? 'text-red-600' : 'text-green-700'}`}>{f.coeff_fmt}</p>
+                        <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 leading-tight">{f.label}</p>
+                        <p className={`text-xs font-bold ${isRisk ? 'text-red-600 dark:text-red-400' : 'text-green-700 dark:text-green-400'}`}>{f.coeff_fmt}</p>
                       </div>
-                      <div className="flex-1 h-8 bg-slate-100 rounded-lg overflow-hidden">
+                      <div className="flex-1 h-8 bg-slate-100 dark:bg-slate-800 rounded-xl overflow-hidden">
                         <motion.div
-                          className={`h-full rounded-lg flex items-center px-3 ${isRisk ? 'bg-red-400' : 'bg-green-500'}`}
+                          className={`h-full rounded-xl flex items-center px-3 ${isRisk ? 'bg-red-400' : 'bg-green-500'}`}
                           initial={{ width: 0 }}
                           animate={{ width: `${barWidth}%` }}
                           transition={{ duration: 0.6, delay: i * 0.05, ease: 'easeOut' }}
@@ -334,8 +333,8 @@ export default function ModelInsights() {
                           <span className="text-[11px] font-bold text-white truncate">{f.label}</span>
                         </motion.div>
                       </div>
-                      <div className={`text-xs px-2 py-0.5 rounded font-bold w-16 text-center ${isRisk ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
-                        {isRisk ? 'â†‘ Risk' : 'â†“ Protect'}
+                      <div className={`text-xs px-2 py-1 rounded-lg font-bold w-20 text-center ${isRisk ? 'bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400' : 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400'}`}>
+                        {isRisk ? '↑ Risk' : '↓ Protect'}
                       </div>
                     </motion.div>
                   )
@@ -345,17 +344,17 @@ export default function ModelInsights() {
           </motion.div>
         )}
 
-        {/* â”€â”€ RECOMMENDATIONS TAB â”€â”€ */}
+        {/* ── RECOMMENDATIONS TAB ── */}
         {activeTab === 'recommendations' && (
           <motion.div key="recommendations" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
             <div className="mb-4">
-              <h3 className="text-headline-md font-semibold text-primary">HR Recommendations</h3>
-              <p className="text-sm text-secondary mt-1">
+              <h3 className="text-base font-bold text-primary dark:text-blue-400">HR Recommendations</h3>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
                 Actionable strategies derived from the model's top attrition drivers. Prioritised by predicted impact.
               </p>
             </div>
             {recommendations.length === 0 && (
-              <p className="text-secondary text-sm italic">Start the R API to load recommendations.</p>
+              <p className="text-slate-400 dark:text-slate-500 text-sm italic">Start the R API to load recommendations.</p>
             )}
             <div className="space-y-4">
               {recommendations.map((r, i) => {
@@ -366,20 +365,20 @@ export default function ModelInsights() {
                     initial={{ opacity: 0, y: 12 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3, delay: i * 0.07 }}
-                    className={`border rounded-xl p-5 ${style.bg}`}
+                    className={`border rounded-2xl p-5 ${style.bg}`}
                   >
                     <div className="flex items-start justify-between gap-4 mb-3">
                       <div className="flex items-center gap-2">
                         <span className="text-lg">{style.icon}</span>
-                        <h4 className="font-bold text-on-surface text-base">{r.driver}</h4>
+                        <h4 className="font-bold text-slate-900 dark:text-slate-100 text-base">{r.driver}</h4>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
-                        <span className={`text-[11px] font-bold px-2 py-0.5 rounded uppercase ${style.badge}`}>{r.priority}</span>
-                        <span className="text-xs text-secondary font-mono bg-white/70 px-2 py-0.5 rounded border">{r.coefficient}</span>
+                        <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full uppercase ${style.badge}`}>{r.priority}</span>
+                        <span className="text-xs text-slate-500 dark:text-slate-400 font-mono bg-white/70 dark:bg-slate-900/70 px-2 py-0.5 rounded-lg border border-slate-200 dark:border-slate-700">{r.coefficient}</span>
                       </div>
                     </div>
-                    <p className="text-sm text-on-surface leading-relaxed mb-2">{r.recommendation}</p>
-                    <p className="text-xs text-secondary italic border-t border-current/10 pt-2">{r.impact}</p>
+                    <p className="text-sm text-slate-800 dark:text-slate-200 leading-relaxed mb-2">{r.recommendation}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 italic border-t border-current/10 pt-2">{r.impact}</p>
                   </motion.div>
                 )
               })}
@@ -387,17 +386,17 @@ export default function ModelInsights() {
           </motion.div>
         )}
 
-        {/* â”€â”€ ETHICS TAB â”€â”€ */}
+        {/* ── ETHICS TAB ── */}
         {activeTab === 'ethics' && (
           <motion.div key="ethics" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
             <div className="mb-4">
-              <h3 className="text-headline-md font-semibold text-primary">Ethical Implications</h3>
-              <p className="text-sm text-secondary mt-1">
+              <h3 className="text-base font-bold text-primary dark:text-blue-400">Ethical Implications</h3>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
                 Responsible AI considerations for deploying this attrition prediction system in an HR context.
               </p>
             </div>
             {ethicalItems.length === 0 && (
-              <p className="text-secondary text-sm italic">Start the R API to load ethical review.</p>
+              <p className="text-slate-400 dark:text-slate-500 text-sm italic">Start the R API to load ethical review.</p>
             )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {ethicalItems.map((e, i) => (
@@ -406,15 +405,15 @@ export default function ModelInsights() {
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3, delay: i * 0.06 }}
-                  className="bg-white border border-slate-200 rounded-xl p-5"
+                  className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm p-5"
                 >
                   <div className="flex items-center gap-2 mb-3">
-                    <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
-                      <span className="material-symbols-outlined text-blue-700 text-[18px]">policy</span>
+                    <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center">
+                      <span className="material-symbols-outlined text-blue-700 dark:text-blue-400 text-[18px]">policy</span>
                     </div>
-                    <h4 className="font-bold text-on-surface text-sm">{e.aspect}</h4>
+                    <h4 className="font-bold text-slate-900 dark:text-slate-100 text-sm">{e.aspect}</h4>
                   </div>
-                  <p className="text-sm text-secondary leading-relaxed">{e.detail}</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{e.detail}</p>
                 </motion.div>
               ))}
             </div>
