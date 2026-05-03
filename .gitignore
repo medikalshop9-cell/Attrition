@@ -2,3 +2,13 @@
 *.csv
 *.log
 outputs/
+.vite/
+node_modules/
+*.rds
+*.csv
+*.log
+*.txt
+outputs/
+.Rhistory
+.RData
+rsconnect/
