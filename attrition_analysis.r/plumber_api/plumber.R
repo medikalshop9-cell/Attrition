@@ -19,6 +19,7 @@ library(plumber)
 # ---------------------------------------------------------------------------
 ALLOWED_ORIGINS <- c(
   "https://friendly-monstera-389b24.netlify.app",
+  "https://attrition-production-cb96.up.railway.app",
   "http://localhost:5173",   # Vite dev server
   "http://localhost:3000"    # CRA / other local dev
 )
