@@ -9,10 +9,13 @@ if (!requireNamespace("rsconnect", quietly = TRUE)) {
 library(rsconnect)
 
 # 1. Authenticate with shinyapps.io
+#    Set credentials via environment variables or ~/.Renviron:
+#      SHINYAPPS_TOKEN=<your token>
+#      SHINYAPPS_SECRET=<your secret>
 rsconnect::setAccountInfo(
   name   = "attrition",
-  token  = "REDACTED_TOKEN",
-  secret = "REDACTED_SECRET"
+  token  = Sys.getenv("SHINYAPPS_TOKEN"),
+  secret = Sys.getenv("SHINYAPPS_SECRET")
 )
 
 # 2. Deploy the plumber_api folder
